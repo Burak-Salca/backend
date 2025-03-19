@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsStrongPassword, MaxLength, MinLength } from "class-validator";
+/*import { IsNotEmpty, IsStrongPassword, MaxLength, MinLength } from "class-validator";
 import { DtoPrefix, getValidationMessage, ValidationType } from "src/_common/enums/ValidationMessages.enum";
 
 export class LoginRequestDTO{
@@ -13,4 +13,4 @@ export class LoginRequestDTO{
     @MinLength(6,{message: getValidationMessage(DtoPrefix.EMAIL,ValidationType.MIN_LENGTH,6)})
     @IsNotEmpty({message: getValidationMessage(DtoPrefix.EMAIL, ValidationType.NOT_EMPTY)})
     password: string;
-}
+}*/

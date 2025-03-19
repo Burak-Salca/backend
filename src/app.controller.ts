@@ -12,6 +12,6 @@ export class AppController {
   @Get()
   getHello(){
     const users = [{id:2,username:'burak'}];
-    return new BaseResponse(users, ResponseMessages.SUCCESS, true);
+    return new BaseResponse(users, ResponseMessages.SUCCESS, 200);
   }
 }

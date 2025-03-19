@@ -2,11 +2,11 @@ import { ResponseMessages } from "src/_common/enums/ResponseMessages.enum";
 
 export class BaseResponse<T> {
     data : T;
-    success: boolean;
+    status: number;
     message: string;
-    constructor(data:T, message: string, success: boolean) {
+    constructor(data:T, message: string, status: number) {
         this.data = data;
         this.message = message;
-        this.success = success;
+        this.status = status;
     }
 }
