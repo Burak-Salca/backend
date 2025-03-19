@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/request/create.student.dto';
 import { BaseResponse } from 'src/_base/response/base.response';
@@ -43,12 +43,18 @@ export class StudentsController {
   @Post(':studentId/courses/:courseId')
   async addCourse(@Param('studentId') studentId: string, @Param('courseId') courseId: string) {
     const student = await this.studentsService.addCourse(+studentId, +courseId);
-    return new BaseResponse(student, 'Kurs başarıyla eklendi', HttpStatus.OK);
+    return new BaseResponse(student, 'Kursa başarıyla kayıt olundu', HttpStatus.OK);
   }
 
   @Delete(':studentId/courses/:courseId')
   async removeCourse(@Param('studentId') studentId: string, @Param('courseId') courseId: string) {
     const student = await this.studentsService.removeCourse(+studentId, +courseId);
-    return new BaseResponse(student, 'Kurs başarıyla kaldırıldı', HttpStatus.OK);
+    return new BaseResponse(student, 'Kurs kaydı başaraılı bir şekilde silindi', HttpStatus.OK);
+  }
+
+  @Get(':id/courses')
+  async getStudentCourses(@Param('id', ParseIntPipe) id: number) {
+    const courses = await this.studentsService.getStudentCourses(id);
+    return new BaseResponse(courses, `Id no:${id} olan öğrencinin kayıtlı olduğu dersler başarıyla listelendi`, HttpStatus.OK);
   }
 }

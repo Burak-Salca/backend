@@ -78,12 +78,26 @@ export class StudentsService {
       where: { id: studentId },
       relations: ['courses'],
     });
+    const course = await this.coursesRepository.findOneBy({ id: courseId });
+    
+    if (!student || !course) {
+      throw new NotFoundException('Öğrenci veya kurs bulunamadı');
+    }
+
+    student.courses = student.courses.filter(course => course.id !== courseId);
+    return this.studentsRepository.save(student);
+  }
+
+  async getStudentCourses(studentId: number): Promise<Courses[]> {
+    const student = await this.studentsRepository.findOne({
+      where: { id: studentId },
+      relations: ['courses'],
+    });
 
     if (!student) {
       throw new NotFoundException('Öğrenci bulunamadı');
     }
 
-    student.courses = student.courses.filter(course => course.id !== courseId);
-    return this.studentsRepository.save(student);
+    return student.courses;
   }
 }

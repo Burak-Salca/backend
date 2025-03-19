@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/request/create.course.dto';
 import { UpdateCourseDto } from './dto/request/update.course.dto';
@@ -38,5 +38,11 @@ export class CoursesController {
   async remove(@Param('id') id: string) {
     const course = await this.coursesService.remove(+id);
     return new BaseResponse(course, 'Kurs başarıyla silindi', HttpStatus.OK);
+  }
+
+  @Get(':id/students')
+  async getCourseStudents(@Param('id', ParseIntPipe) id: number) {
+    const students = await this.coursesService.getCourseStudents(id);
+    return new BaseResponse(students, `Id no:${id} olan derse kayıtlı öğrenciler başarıyla listelendi`, HttpStatus.OK);
   }
 } 

@@ -1,5 +1,3 @@
-import { ResponseMessages } from "src/_common/enums/ResponseMessages.enum";
-
 export class BaseResponse<T> {
     data : T;
     status: number;
