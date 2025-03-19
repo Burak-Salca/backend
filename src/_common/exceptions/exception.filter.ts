@@ -11,7 +11,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof QueryFailedError) {
       if (exception.message.includes('duplicate key value violates unique constraint')) {
-        response.status(HttpStatus.CONFLICT).json(new BaseResponse(null, 'Bu email adresi zaten kayıtlı.', HttpStatus.CONFLICT));
+        response.status(HttpStatus.CONFLICT).json(new BaseResponse(null, 'Böyle bir kayıt zten var', HttpStatus.CONFLICT));
       } else {
         response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(new BaseResponse(null, 'Sunucu hatası.', HttpStatus.INTERNAL_SERVER_ERROR));
       }

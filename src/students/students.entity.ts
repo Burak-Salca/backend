@@ -18,6 +18,9 @@ export class Students {
   @Column({ length: 255 })
   password: string;
 
+  @Column({ type: 'date' })
+  birthDate: Date;
+
   @ManyToMany(() => Courses, course => course.students)
   @JoinTable()
   courses: Courses[];

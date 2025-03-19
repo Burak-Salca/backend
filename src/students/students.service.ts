@@ -35,9 +35,9 @@ export class StudentsService {
       throw new NotFoundException('Öğrenci bulunamadı');
     }
 
-    // Sadece firstName ve lastName alanlarını güncelle
     student.firstName = updateStudentDto.firstName;
     student.lastName = updateStudentDto.lastName;
+    student.birthDate = updateStudentDto.birthDate;
 
     return this.studentsRepository.save(student);
   }
