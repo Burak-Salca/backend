@@ -39,4 +39,16 @@ export class StudentsController {
     const student = await this.studentsService.remove(+id);
     return new BaseResponse(student, 'Öğrenci başarıyla silindi', HttpStatus.OK);
   }
+
+  @Post(':studentId/courses/:courseId')
+  async addCourse(@Param('studentId') studentId: string, @Param('courseId') courseId: string) {
+    const student = await this.studentsService.addCourse(+studentId, +courseId);
+    return new BaseResponse(student, 'Kurs başarıyla eklendi', HttpStatus.OK);
+  }
+
+  @Delete(':studentId/courses/:courseId')
+  async removeCourse(@Param('studentId') studentId: string, @Param('courseId') courseId: string) {
+    const student = await this.studentsService.removeCourse(+studentId, +courseId);
+    return new BaseResponse(student, 'Kurs başarıyla kaldırıldı', HttpStatus.OK);
+  }
 }

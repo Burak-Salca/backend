@@ -27,6 +27,7 @@ import { Courses } from './courses/courses.entity';
     StudentsModule,
     CoursesModule,
     AdminsModule,
+ 
   ],
   controllers: [AppController],
   providers: [AppService],
