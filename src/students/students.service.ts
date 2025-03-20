@@ -5,6 +5,7 @@ import { Students } from './students.entity';
 import { CreateStudentDto } from './dto/request/create.student.dto';
 import { UpdateStudentDTO } from './dto/request/update.student.dto';
 import { Courses } from '../courses/courses.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StudentsService {
@@ -16,7 +17,12 @@ export class StudentsService {
   ) {}
 
   async create(createStudentDto: CreateStudentDto): Promise<Students> {
-    const student = this.studentsRepository.create(createStudentDto);
+    const { password, ...rest } = createStudentDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const student = this.studentsRepository.create({
+      ...rest,
+      password: hashedPassword,
+    });
     return this.studentsRepository.save(student);
   }
 
@@ -40,7 +46,6 @@ export class StudentsService {
 
     student.firstName = updateStudentDto.firstName;
     student.lastName = updateStudentDto.lastName;
-    student.birthDate = updateStudentDto.birthDate;
 
     return this.studentsRepository.save(student);
   }
@@ -99,5 +104,9 @@ export class StudentsService {
     }
 
     return student.courses;
+  }
+
+  async findByEmail(email: string): Promise<Students | null> {
+    return this.studentsRepository.findOne({ where: { email } });
   }
 }

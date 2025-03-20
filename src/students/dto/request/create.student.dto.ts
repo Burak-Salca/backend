@@ -18,7 +18,4 @@ export class CreateStudentDto {
   @IsStrongPassword({}, { message: 'Şifre en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir' })
   password: string;
 
-  @IsNotEmpty({ message: 'Doğum tarihi boş olamaz' })
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'Geçerli bir tarih formatı girin (YYYY-MM-DD)' })
-  birthDate: Date;
 }

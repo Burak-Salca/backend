@@ -1,19 +1,19 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
 import { AdminsService } from '../admins/admins.service';
-import { Users } from '../users/users.entity';
 import { RegisterAdminDto } from './dto/request/register.admin.dto';
-import { UserRole } from '../_common/enums/auth.enums';
-import { LoginAdminDto } from './dto/request/login.admin.dto';
 import * as bcrypt from 'bcrypt';
 import { BaseResponse } from '../_base/response/base.response';
+import { StudentsService } from 'src/students/students.service';
+import { LoginStudentDto } from './dto/request/login.student.dto';
+import { LoginAdminDto } from './dto/request/login.admin.dto';
+
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
     private adminsService: AdminsService,
+    private studentService: StudentsService,
     private jwtService: JwtService,
   ) {}
 
@@ -21,7 +21,7 @@ export class AuthService {
     return this.adminsService.create(registerAdminDto);
   }
   
-  async login(loginAdminDto: LoginAdminDto) {
+  async loginAdmin(loginAdminDto: LoginAdminDto) {
     const { email, password } = loginAdminDto;
     const admin = await this.adminsService.findByEmail(email);
 
@@ -43,15 +43,28 @@ export class AuthService {
     }, 'Giriş başarılı', 200);
   }
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
+  async loginStudent(loginStudentDto: LoginStudentDto) {
+    const { email, password } = loginStudentDto;
+    const student = await this.studentService.findByEmail(email);
+
+    if (!student || !(await bcrypt.compare(password, student.password))) {
+      return new BaseResponse(null, 'Geçersiz e-posta veya şifre', 401);
     }
-    return null;
+
+    const payload = { email: student.email, sub: student.id };
+    const accessToken = this.jwtService.sign(payload);
+
+    return new BaseResponse({
+      access_token: accessToken,
+      student: {
+        id: student.id,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        email: student.email,
+      },
+    }, 'Giriş başarılı', 200);
   }
-  
+
   async logout(user: any): Promise<{ message: string }> {
     // Sunucu tarafında bir işlem yapmak istiyorsanız buraya ekleyin
     // Örneğin, token'ı bir kara listeye ekleyebilirsiniz

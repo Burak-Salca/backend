@@ -5,12 +5,14 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AdminsModule } from '../admins/admins.module';
+import { StudentsModule } from 'src/students/students.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     AdminsModule,
+    StudentsModule,
     JwtModule.register({
       secret: 'yourSecretKey',
       signOptions: { expiresIn: '60m' },
