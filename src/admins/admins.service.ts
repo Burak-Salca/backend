@@ -4,16 +4,22 @@ import { Repository } from 'typeorm';
 import { Admins } from './admins.entity';
 import { CreateAdminDto } from './dto/request/create.admin.dto';
 import { UpdateAdminDto } from './dto/request/update.admin.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
-  export class AdminsService {  
+export class AdminsService {
   constructor(
     @InjectRepository(Admins)
     private adminsRepository: Repository<Admins>,
   ) {}
 
   async create(createAdminDto: CreateAdminDto): Promise<Admins> {
-    const admin = this.adminsRepository.create(createAdminDto);
+    const { password, ...rest } = createAdminDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const admin = this.adminsRepository.create({
+      ...rest,
+      password: hashedPassword,
+    });
     return this.adminsRepository.save(admin);
   }
 
@@ -39,5 +45,9 @@ import { UpdateAdminDto } from './dto/request/update.admin.dto';
     const admin = await this.findOne(id);
     await this.adminsRepository.remove(admin);
     return admin;
+  }
+
+  async findByEmail(email: string): Promise<Admins | null> {
+    return this.adminsRepository.findOne({ where: { email } });
   }
 } 

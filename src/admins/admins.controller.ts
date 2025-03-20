@@ -8,12 +8,12 @@ import { BaseResponse } from '../_base/response/base.response';
 export class AdminsController {
   constructor(private readonly adminsService: AdminsService) {}
 
-  @Post()
+  /*@Post()
   @UsePipes(ValidationPipe)
   async create(@Body() createAdminDto: CreateAdminDto) {
     const admin = await this.adminsService.create(createAdminDto);
     return new BaseResponse(admin, 'Admin başarıyla oluşturuldu', HttpStatus.CREATED);
-  }
+  }*/
 
   @Get()
   async findAll() {
