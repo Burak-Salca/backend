@@ -30,22 +30,22 @@ export class AdminsService {
     return this.adminsRepository.find();
   }
 
-  async findOne(id: number): Promise<Admins> {
-    const admin = await this.adminsRepository.findOneBy({ id });
+  async findById(id: number): Promise<Admins> {
+    const admin = await this.adminsRepository.findOne({ where: { id } });
     if (!admin) {
-      throw new NotFoundException('Admin bulunamadı');
+      throw new NotFoundException(new BaseResponse(null, 'Admin bulunamadı', 404));
     }
     return admin;
   }
 
   async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admins> {
-    const admin = await this.findOne(id);
+    const admin = await this.findById(id);
     Object.assign(admin, updateAdminDto);
     return this.adminsRepository.save(admin);
   }
 
   async remove(id: number): Promise<Admins> {
-    const admin = await this.findOne(id);
+    const admin = await this.findById(id);
     await this.adminsRepository.remove(admin);
     return admin;
   }
@@ -54,11 +54,5 @@ export class AdminsService {
     return this.adminsRepository.findOne({ where: { email } });
   }
 
-  async findById(id: number): Promise<Admins> {
-    const admin = await this.adminsRepository.findOne({ where: { id } });
-    if (!admin) {
-      throw new NotFoundException(new BaseResponse(null, 'Admin bulunamadı', 404));
-    }
-    return admin;
-  }
+  
 } 

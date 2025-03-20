@@ -1,14 +1,20 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe, HttpStatus, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe, HttpStatus, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/request/create.student.dto';
 import { BaseResponse } from 'src/_base/response/base.response';
 import { UpdateStudentDTO } from './dto/request/update.student.dto';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
+import { UserRole } from 'src/_common/enums/auth.enums';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('students')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
   @Post()
+  @Roles(UserRole.ADMIN)
   @UsePipes(ValidationPipe)
   async create(@Body() createStudentDto: CreateStudentDto) {
     const student = await this.studentsService.create(createStudentDto);
@@ -23,7 +29,7 @@ export class StudentsController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const student = await this.studentsService.findOne(+id);
+    const student = await this.studentsService.findById(+id);
     return new BaseResponse(student, 'Öğrenci başarıyla bulundu', HttpStatus.OK);
   }
 

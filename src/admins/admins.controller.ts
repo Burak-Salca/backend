@@ -23,7 +23,7 @@ export class AdminsController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const admin = await this.adminsService.findOne(+id);
+    const admin = await this.adminsService.findById(+id);
     return new BaseResponse(admin, 'Admin başarıyla bulundu', HttpStatus.OK);
   }
 

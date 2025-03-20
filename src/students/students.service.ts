@@ -31,14 +31,6 @@ export class StudentsService {
     return this.studentsRepository.find();
   }
 
-  async findOne(id: number): Promise<Students> {
-    const student = await this.studentsRepository.findOneBy({ id });
-    if (!student) {
-      throw new NotFoundException('Öğrenci bulunamadı');
-    }
-    return student;
-  }
-
   async update(id: number, updateStudentDto: UpdateStudentDTO): Promise<Students> {
     const student = await this.studentsRepository.findOneBy({ id });
     if (!student) {
@@ -57,6 +49,14 @@ export class StudentsService {
       throw new NotFoundException('Öğrenci bulunamadı');
     }
     await this.studentsRepository.remove(student);
+    return student;
+  }
+
+  async findById(id: number): Promise<Students> {
+    const student = await this.studentsRepository.findOne({ where: { id } });
+    if (!student) {
+      throw new NotFoundException(new BaseResponse(null, 'Öğrenci bulunamadı', 404));
+    }
     return student;
   }
 
@@ -111,11 +111,5 @@ export class StudentsService {
     return this.studentsRepository.findOne({ where: { email } });
   }
 
-  async findById(id: number): Promise<Students> {
-    const student = await this.studentsRepository.findOne({ where: { id } });
-    if (!student) {
-      throw new NotFoundException(new BaseResponse(null, 'Öğrenci bulunamadı', 404));
-    }
-    return student;
-  }
+  
 }
