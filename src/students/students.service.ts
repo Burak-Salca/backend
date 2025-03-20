@@ -7,6 +7,7 @@ import { UpdateStudentDTO } from './dto/request/update.student.dto';
 import { Courses } from '../courses/courses.entity';
 import * as bcrypt from 'bcrypt';
 import { BaseResponse } from '../_base/response/base.response';
+import { UserRole } from '../_common/enums/auth.enums';
 
 @Injectable()
 export class StudentsService {
@@ -17,99 +18,182 @@ export class StudentsService {
     private coursesRepository: Repository<Courses>,
   ) {}
 
+  // ADMIN İŞLEMLERİ İÇİN SERVİSLER
+
   async create(createStudentDto: CreateStudentDto): Promise<Students> {
+    // Önce email kontrolü yapalım
+    const existingStudent = await this.findByEmail(createStudentDto.email);
+    if (existingStudent) {
+      throw new ConflictException(
+        new BaseResponse(null, 'Bu email adresi zaten kullanımda', 409)
+      );
+    }
+
     const { password, ...rest } = createStudentDto;
     const hashedPassword = await bcrypt.hash(password, 10);
+    
     const student = this.studentsRepository.create({
       ...rest,
       password: hashedPassword,
+      role: UserRole.STUDENT,
     });
+    
     return this.studentsRepository.save(student);
   }
 
   async findAll(): Promise<Students[]> {
-    return this.studentsRepository.find();
+    return this.studentsRepository.find({
+      select: ['id', 'firstName', 'lastName', 'email', 'role'] // password hariç bilgileri getir
+    });
   }
 
   async update(id: number, updateStudentDto: UpdateStudentDTO): Promise<Students> {
-    const student = await this.studentsRepository.findOneBy({ id });
-    if (!student) {
-      throw new NotFoundException('Öğrenci bulunamadı');
+    const student = await this.findById(id);
+    
+    // Email güncellenmek isteniyorsa ve yeni email başka bir öğrencide varsa hata ver
+    if (updateStudentDto.email && updateStudentDto.email !== student.email) {
+      const existingStudent = await this.findByEmail(updateStudentDto.email);
+      if (existingStudent) {
+        throw new ConflictException(
+          new BaseResponse(null, 'Bu email adresi zaten kullanımda', 409)
+        );
+      }
     }
 
-    student.firstName = updateStudentDto.firstName;
-    student.lastName = updateStudentDto.lastName;
+    // Eğer şifre güncellenecekse hashle
+    if (updateStudentDto.password) {
+      updateStudentDto.password = await bcrypt.hash(updateStudentDto.password, 10);
+    }
 
+    Object.assign(student, updateStudentDto);
     return this.studentsRepository.save(student);
   }
 
   async remove(id: number): Promise<Students> {
-    const student = await this.studentsRepository.findOneBy({ id });
+    const student = await this.findById(id);
+    return this.studentsRepository.remove(student);
+  }
+
+  // ÖĞRENCİ İŞLEMLERİ İÇİN SERVİSLER
+
+  async findById(id: number): Promise<Students> {
+    console.log('Finding student by ID:', id);
+    
+    const student = await this.studentsRepository.findOne({ 
+      where: { id },
+      relations: ['courses'],
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        courses: true
+      }
+    });
+
+    console.log('Database query result:', {
+      found: !!student,
+      studentDetails: student ? {
+        id: student.id,
+        email: student.email,
+        firstName: student.firstName,
+        lastName: student.lastName
+      } : null
+    });
+
     if (!student) {
-      throw new NotFoundException('Öğrenci bulunamadı');
+      throw new NotFoundException(
+        new BaseResponse(null, 'Öğrenci bulunamadı', 404)
+      );
     }
-    await this.studentsRepository.remove(student);
     return student;
   }
 
-  async findById(id: number): Promise<Students> {
-    const student = await this.studentsRepository.findOne({ where: { id } });
-    if (!student) {
-      throw new NotFoundException(new BaseResponse(null, 'Öğrenci bulunamadı', 404));
-    }
-    return student;
+  async findByEmail(email: string): Promise<Students | null> {
+    return this.studentsRepository.findOne({ 
+      where: { email },
+      select: ['id', 'firstName', 'lastName', 'email', 'password', 'role'] // password dahil (login için)
+    });
   }
+
+  // KURS İŞLEMLERİ İÇİN SERVİSLER
 
   async addCourse(studentId: number, courseId: number): Promise<Students> {
     const student = await this.studentsRepository.findOne({
       where: { id: studentId },
       relations: ['courses'],
     });
-    const course = await this.coursesRepository.findOneBy({ id: courseId });
 
-    if (!student || !course) {
-      throw new NotFoundException('Öğrenci veya kurs bulunamadı');
+    if (!student) {
+      throw new NotFoundException(
+        new BaseResponse(null, 'Öğrenci bulunamadı', 404)
+      );
     }
 
+    const course = await this.coursesRepository.findOneBy({ id: courseId });
+    if (!course) {
+      throw new NotFoundException(
+        new BaseResponse(null, 'Kurs bulunamadı', 404)
+      );
+    }
+
+    // Öğrenci zaten bu kursa kayıtlı mı kontrol et
     if (student.courses.some(c => c.id === courseId)) {
-      throw new ConflictException('Bu öğrenci zaten bu derse kayıtlı');
+      throw new ConflictException(
+        new BaseResponse(null, 'Bu öğrenci zaten bu derse kayıtlı', 409)
+      );
     }
 
     student.courses.push(course);
     return this.studentsRepository.save(student);
   }
 
-  async removeCourse(studentId: number, courseId: number): Promise<Students> {
-    const student = await this.studentsRepository.findOne({
-      where: { id: studentId },
-      relations: ['courses'],
-    });
-    const course = await this.coursesRepository.findOneBy({ id: courseId });
-    
-    if (!student || !course) {
-      throw new NotFoundException('Öğrenci veya kurs bulunamadı');
-    }
-
-    student.courses = student.courses.filter(course => course.id !== courseId);
-    return this.studentsRepository.save(student);
-  }
-
-  async getStudentCourses(studentId: number): Promise<Courses[]> {
+  async removeCourse(studentId: number, courseId: number): Promise<Courses> {
     const student = await this.studentsRepository.findOne({
       where: { id: studentId },
       relations: ['courses'],
     });
 
     if (!student) {
-      throw new NotFoundException('Öğrenci bulunamadı');
+      throw new NotFoundException(
+        new BaseResponse(null, 'Öğrenci bulunamadı', 404)
+      );
+    }
+
+    const removedCourse = student.courses.find(c => c.id === courseId);
+    if (!removedCourse) {
+      throw new NotFoundException(
+        new BaseResponse(null, 'Öğrenci bu kursa kayıtlı değil', 404)
+      );
+    }
+
+    student.courses = student.courses.filter(course => course.id !== courseId);
+    await this.studentsRepository.save(student);
+
+    return removedCourse;
+  }
+
+  async getStudentCourses(studentId: number): Promise<Courses[]> {
+    console.log('Getting courses for student ID:', studentId);
+
+    const student = await this.studentsRepository.findOne({
+      where: { id: studentId },
+      relations: ['courses'],
+    });
+
+    console.log('Student found with courses:', {
+      studentId: student?.id,
+      coursesCount: student?.courses?.length,
+      studentEmail: student?.email
+    });
+
+    if (!student) {
+      throw new NotFoundException(
+        new BaseResponse(null, 'Öğrenci bulunamadı', 404)
+      );
     }
 
     return student.courses;
   }
-
-  async findByEmail(email: string): Promise<Students | null> {
-    return this.studentsRepository.findOne({ where: { email } });
-  }
-
-  
 }

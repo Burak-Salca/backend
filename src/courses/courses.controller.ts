@@ -22,18 +22,21 @@ export class CoursesController {
   }
 
   @Get()
+  @Roles(UserRole.ADMIN, UserRole.STUDENT)
   async findAll() {
     const courses = await this.coursesService.findAll();
     return new BaseResponse(courses, 'Kurslar başarıyla listelendi', HttpStatus.OK);
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMIN)
   async findOne(@Param('id') id: string) {
     const course = await this.coursesService.findOne(+id);
     return new BaseResponse(course, 'Kurs başarıyla bulundu', HttpStatus.OK);
   }
 
   @Put(':id')
+  @Roles(UserRole.ADMIN)
   @UsePipes(ValidationPipe)
   async update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
     const course = await this.coursesService.update(+id, updateCourseDto);
@@ -41,14 +44,16 @@ export class CoursesController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN)
   async remove(@Param('id') id: string) {
     const course = await this.coursesService.remove(+id);
     return new BaseResponse(course, 'Kurs başarıyla silindi', HttpStatus.OK);
   }
 
   @Get(':id/students')
+  @Roles(UserRole.ADMIN)
   async getCourseStudents(@Param('id', ParseIntPipe) id: number) {
     const students = await this.coursesService.getCourseStudents(id);
-    return new BaseResponse(students, `Id no:${id} olan derse kayıtlı öğrenciler başarıyla listelendi`, HttpStatus.OK);
+    return new BaseResponse(students, `${id} id nolu derse kayıtlı öğrenciler başarıyla listelendi`, HttpStatus.OK);
   }
 } 

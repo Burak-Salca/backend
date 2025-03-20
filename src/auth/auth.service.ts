@@ -60,8 +60,24 @@ export class AuthService {
       return new BaseResponse(null, 'Geçersiz e-posta veya şifre', 401);
     }
 
-    const payload = { email: student.email, sub: student.id, type: 'student' };
+    console.log('Student before token creation:', {
+      id: student.id,
+      email: student.email,
+      role: student.role
+    });
+
+    const payload = { 
+      email: student.email, 
+      sub: student.id,
+      type: 'student'
+    };
+
+    console.log('Token payload:', payload);
+
     const accessToken = this.jwtService.sign(payload);
+
+    const decodedToken = this.jwtService.decode(accessToken);
+    console.log('Decoded token:', decodedToken);
 
     return new BaseResponse({
       access_token: accessToken,

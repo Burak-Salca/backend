@@ -5,6 +5,7 @@ import { Courses } from './courses.entity';
 import { CreateCourseDto } from './dto/request/create.course.dto';
 import { UpdateCourseDto } from './dto/request/update.course.dto';
 import { Students } from '../students/students.entity';
+import { BaseResponse } from '../_base/response/base.response';
 
 @Injectable()
 export class CoursesService {
@@ -51,7 +52,11 @@ export class CoursesService {
     });
 
     if (!course) {
-      throw new NotFoundException('Ders bulunamadı');
+      throw new NotFoundException(new BaseResponse(null, `${courseId} id nolu ders bulunamadı`, 404));
+    }
+
+    if (!course.students || course.students.length === 0) {
+      throw new NotFoundException(new BaseResponse(null, `${courseId} id nolu dersin öğrenci kaydı yok`, 404));
     }
 
     return course.students;

@@ -6,7 +6,6 @@ import { AdminsService } from '../admins/admins.service';
 import { StudentsService } from '../students/students.service';
 import { BaseResponse } from '../_base/response/base.response';
 import { tokenBlacklist } from './auth.service';
-import { Request as ExpressRequest } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -17,47 +16,51 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'yourSecretKey', 
+      secretOrKey: 'yourSecretKey',
       passReqToCallback: true
     });
   }
 
-  async validate(req: ExpressRequest, payload: any) {
-    const token = req.headers['authorization']?.split(' ')[1];
-    
-    // Token ve tokenBlacklist durumunu konsola yazdır
-    console.log('Payload:', payload);
-    console.log('Current Token:', token);
-    console.log('Token Blacklist:', Array.from(tokenBlacklist));
+  async validate(req: any, payload: any) {
+    console.log('JWT Strategy - Incoming payload:', payload);
+
+    const token = req.headers.authorization?.split(' ')[1];
+    console.log('Current token:', token);
 
     if (token && tokenBlacklist.has(token)) {
       throw new UnauthorizedException(new BaseResponse(null, 'Token geçersiz', 401));
     }
     
-    let userRole: UserRole | null = null;
     try {
       if (payload.type === 'admin') {
         const admin = await this.adminsService.findById(payload.sub);
-        if (admin) {
-          userRole = admin.role;
-        } else {
+        if (!admin) {
           throw new UnauthorizedException(new BaseResponse(null, 'Admin bulunamadı', 401));
         }
-      } else if (payload.type === 'student') {
+        return {
+          sub: payload.sub,
+          email: payload.email,
+          type: payload.type,
+          role: UserRole.ADMIN
+        };
+      } 
+      else if (payload.type === 'student') {
         const student = await this.studentsService.findById(payload.sub);
-        if (student) {
-          userRole = student.role;
-        } else {
+        if (!student) {
           throw new UnauthorizedException(new BaseResponse(null, 'Öğrenci bulunamadı', 401));
         }
+        return {
+          sub: payload.sub,
+          email: payload.email,
+          type: payload.type,
+          role: UserRole.STUDENT
+        };
       }
     } catch (error) {
+      console.error('Validation error:', error);
       throw new UnauthorizedException(new BaseResponse(null, 'Kullanıcı bulunamadı veya yetkisiz', 401));
     }
 
-    if (!userRole) {
-      throw new UnauthorizedException(new BaseResponse(null, 'Rol atanamadı', 401));
-    }
-    return { userId: payload.sub, email: payload.email, role: userRole };
+    throw new UnauthorizedException(new BaseResponse(null, 'Geçersiz kullanıcı tipi', 401));
   }
 }

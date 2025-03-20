@@ -17,5 +17,4 @@ export class CreateStudentDto {
   @IsNotEmpty({ message: 'Şifre boş olamaz' })
   @IsStrongPassword({}, { message: 'Şifre en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir' })
   password: string;
-
 }

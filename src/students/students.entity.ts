@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { Courses } from '../courses/courses.entity';
+import { UserRole } from '../_common/enums/auth.enums';
 
 
 @Entity()
@@ -22,6 +23,7 @@ export class Students {
   @ManyToMany(() => Courses, course => course.students)
   @JoinTable({name: 'students_courses'})
   courses: Courses[];
-  role: import("c:/projeler/projects/backend/src/_common/enums/auth.enums").UserRole;
 
-}
+  @Column()
+  role: UserRole;
+} 
