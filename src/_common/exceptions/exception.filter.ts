@@ -1,22 +1,23 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus, NotFoundException } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
 import { Response } from 'express';
 import { BaseResponse } from 'src/_base/response/base.response';
 
-@Catch(QueryFailedError, NotFoundException)
+@Catch(QueryFailedError, NotFoundException, UnauthorizedException)
 export class CustomExceptionFilter implements ExceptionFilter {
-  catch(exception: QueryFailedError | NotFoundException, host: ArgumentsHost) {
+  catch(exception: QueryFailedError | NotFoundException | UnauthorizedException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
     if (exception instanceof QueryFailedError) {
-      if (exception.message.includes('duplicate key value violates unique constraint')) {
-        response.status(HttpStatus.CONFLICT).json(new BaseResponse(null, 'Böyle bir kayıt zten var', HttpStatus.CONFLICT));
-      } else {
-        response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(new BaseResponse(null, 'Sunucu hatası.', HttpStatus.INTERNAL_SERVER_ERROR));
-      }
+      response.status(HttpStatus.CONFLICT).json(new BaseResponse(null, 'Böyle bir kayıt zaten var', HttpStatus.CONFLICT));
     } else if (exception instanceof NotFoundException) {
       response.status(HttpStatus.NOT_FOUND).json(new BaseResponse(null, exception.message, HttpStatus.NOT_FOUND));
+    } else if (exception instanceof UnauthorizedException) {
+      response.status(HttpStatus.UNAUTHORIZED).json(new BaseResponse(null, exception.message, HttpStatus.UNAUTHORIZED));
+    }
+    else {
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(new BaseResponse(null, 'Sunucu hatası.', HttpStatus.INTERNAL_SERVER_ERROR));
     }
   }
 }

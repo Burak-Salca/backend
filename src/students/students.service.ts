@@ -6,6 +6,7 @@ import { CreateStudentDto } from './dto/request/create.student.dto';
 import { UpdateStudentDTO } from './dto/request/update.student.dto';
 import { Courses } from '../courses/courses.entity';
 import * as bcrypt from 'bcrypt';
+import { BaseResponse } from '../_base/response/base.response';
 
 @Injectable()
 export class StudentsService {
@@ -108,5 +109,13 @@ export class StudentsService {
 
   async findByEmail(email: string): Promise<Students | null> {
     return this.studentsRepository.findOne({ where: { email } });
+  }
+
+  async findById(id: number): Promise<Students> {
+    const student = await this.studentsRepository.findOne({ where: { id } });
+    if (!student) {
+      throw new NotFoundException(new BaseResponse(null, 'Öğrenci bulunamadı', 404));
+    }
+    return student;
   }
 }

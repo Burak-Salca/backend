@@ -18,7 +18,14 @@ export class AuthService {
   ) {}
 
   async register(registerAdminDto: RegisterAdminDto) {
-    return this.adminsService.create(registerAdminDto);
+    const admin = await this.adminsService.create(registerAdminDto);
+
+    return new BaseResponse({
+      id: admin.id,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+      email: admin.email,
+    }, 'Admin başarıyla kaydedildi', 201);
   }
   
   async loginAdmin(loginAdminDto: LoginAdminDto) {
@@ -29,7 +36,7 @@ export class AuthService {
       return new BaseResponse(null, 'Geçersiz e-posta veya şifre', 401);
     }
 
-    const payload = { email: admin.email, sub: admin.id };
+    const payload = { email: admin.email, sub: admin.id, type: 'admin' };
     const accessToken = this.jwtService.sign(payload);
 
     return new BaseResponse({
@@ -51,7 +58,7 @@ export class AuthService {
       return new BaseResponse(null, 'Geçersiz e-posta veya şifre', 401);
     }
 
-    const payload = { email: student.email, sub: student.id };
+    const payload = { email: student.email, sub: student.id, type: 'student' };
     const accessToken = this.jwtService.sign(payload);
 
     return new BaseResponse({

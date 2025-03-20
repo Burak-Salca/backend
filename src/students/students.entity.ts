@@ -22,5 +22,6 @@ export class Students {
   @ManyToMany(() => Courses, course => course.students)
   @JoinTable({name: 'students_courses'})
   courses: Courses[];
+  role: import("c:/projeler/projects/backend/src/_common/enums/auth.enums").UserRole;
 
 }

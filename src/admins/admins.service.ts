@@ -5,6 +5,8 @@ import { Admins } from './admins.entity';
 import { CreateAdminDto } from './dto/request/create.admin.dto';
 import { UpdateAdminDto } from './dto/request/update.admin.dto';
 import * as bcrypt from 'bcrypt';
+import { BaseResponse } from '../_base/response/base.response';
+import { UserRole } from '../_common/enums/auth.enums';
 
 @Injectable()
 export class AdminsService {
@@ -19,6 +21,7 @@ export class AdminsService {
     const admin = this.adminsRepository.create({
       ...rest,
       password: hashedPassword,
+      role: UserRole.ADMIN,
     });
     return this.adminsRepository.save(admin);
   }
@@ -49,5 +52,13 @@ export class AdminsService {
 
   async findByEmail(email: string): Promise<Admins | null> {
     return this.adminsRepository.findOne({ where: { email } });
+  }
+
+  async findById(id: number): Promise<Admins> {
+    const admin = await this.adminsRepository.findOne({ where: { id } });
+    if (!admin) {
+      throw new NotFoundException(new BaseResponse(null, 'Admin bulunamadı', 404));
+    }
+    return admin;
   }
 } 

@@ -10,8 +10,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() registerAdminDto: RegisterAdminDto) {
-    const user = await this.authService.register(registerAdminDto);
-    return { message: 'Admin başarıyla kaydedildi', user };
+    return this.authService.register(registerAdminDto);
   }
 
   @Post('/admin/login')
