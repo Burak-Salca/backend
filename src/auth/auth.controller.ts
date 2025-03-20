@@ -5,7 +5,9 @@ import { LoginAdminDto } from './dto/request/login.admin.dto';
 import { LoginStudentDto } from './dto/request/login.student.dto';
 import { BaseResponse } from '../_base/response/base.response';
 import { Request as ExpressRequest } from 'express';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -26,6 +28,7 @@ export class AuthController {
   } 
 
   @Post('logout')
+  @ApiBearerAuth('access-token')
   async logout(@Req() req: ExpressRequest) {
     const token = req.headers['authorization']?.split(' ')[1];
     
@@ -40,5 +43,4 @@ export class AuthController {
       throw new UnauthorizedException(new BaseResponse(null, 'Token bulunamadı', 401));
     }
   }
-
 }

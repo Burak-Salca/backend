@@ -8,6 +8,7 @@ import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../_common/enums/auth.enums';
 import { BaseResponse } from '../_base/response/base.response';
 import { Request } from 'express';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user: {
@@ -18,6 +19,8 @@ interface RequestWithUser extends Request {
   }
 }
 
+@ApiTags('Students')
+@ApiBearerAuth('access-token')
 @Controller('students')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class StudentsController {

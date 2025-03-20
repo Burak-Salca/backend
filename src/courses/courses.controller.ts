@@ -7,7 +7,10 @@ import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { UserRole } from '../_common/enums/auth.enums';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Courses')
+@ApiBearerAuth('access-token')
 @Controller('courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class CoursesController {

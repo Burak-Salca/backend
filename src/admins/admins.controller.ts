@@ -7,7 +7,10 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
 import { UserRole } from 'src/_common/enums/auth.enums';
 import { Roles } from 'src/auth/roles.decorator';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Admins')
+@ApiBearerAuth('access-token')
 @Controller('admins')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AdminsController {
