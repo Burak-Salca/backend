@@ -5,6 +5,8 @@ import { UserRole } from '../_common/enums/auth.enums';
 import { AdminsService } from '../admins/admins.service';
 import { StudentsService } from '../students/students.service';
 import { BaseResponse } from '../_base/response/base.response';
+import { tokenBlacklist } from './auth.service';
+import { Request as ExpressRequest } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -16,16 +18,26 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: 'yourSecretKey', 
+      passReqToCallback: true
     });
   }
 
-  async validate(payload: any) {
+  async validate(req: ExpressRequest, payload: any) {
+    const token = req.headers['authorization']?.split(' ')[1];
+    
+    // Token ve tokenBlacklist durumunu konsola yazdır
     console.log('Payload:', payload);
+    console.log('Current Token:', token);
+    console.log('Token Blacklist:', Array.from(tokenBlacklist));
+
+    if (token && tokenBlacklist.has(token)) {
+      throw new UnauthorizedException(new BaseResponse(null, 'Token geçersiz', 401));
+    }
+    
     let userRole: UserRole | null = null;
     try {
       if (payload.type === 'admin') {
         const admin = await this.adminsService.findById(payload.sub);
-        console.log('Admin:', admin);
         if (admin) {
           userRole = admin.role;
         } else {
@@ -33,7 +45,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
       } else if (payload.type === 'student') {
         const student = await this.studentsService.findById(payload.sub);
-        console.log('Student:', student);
         if (student) {
           userRole = student.role;
         } else {

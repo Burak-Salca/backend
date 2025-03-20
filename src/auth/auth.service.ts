@@ -9,6 +9,8 @@ import { LoginStudentDto } from './dto/request/login.student.dto';
 import { LoginAdminDto } from './dto/request/login.admin.dto';
 
 
+export const tokenBlacklist = new Set<string>();
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -72,9 +74,9 @@ export class AuthService {
     }, 'Giriş başarılı', 200);
   }
 
-  async logout(user: any): Promise<{ message: string }> {
-    // Sunucu tarafında bir işlem yapmak istiyorsanız buraya ekleyin
-    // Örneğin, token'ı bir kara listeye ekleyebilirsiniz
-    return { message: 'Başarıyla çıkış yapıldı' };
+  async logout(token: string) {
+    tokenBlacklist.add(token);
+    return new BaseResponse(null, 'Başarıyla çıkış yapıldı', 200);
   }
+
 }
