@@ -157,14 +157,14 @@ export class StudentsService {
       );
     }
 
-    const removedCourse = student.courses.find(c => c.id === courseId);
+    const removedCourse = student.courses.find(c => c.id === Number(courseId));
     if (!removedCourse) {
       throw new NotFoundException(
         new BaseResponse(null, 'Öğrenci bu kursa kayıtlı değil', 404)
       );
     }
 
-    student.courses = student.courses.filter(course => course.id !== courseId);
+    student.courses = student.courses.filter(course => course.id !== Number(courseId));
     await this.studentsRepository.save(student);
 
     return removedCourse;
