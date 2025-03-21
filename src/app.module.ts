@@ -20,17 +20,29 @@ import { Courses } from './courses/courses.entity';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'postgres' as const,
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
-        entities: [Students, Admins, Courses],
-        synchronize: true,
-        logging: true,
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const host = configService.get('DB_HOST');
+        const port = configService.get('DB_PORT');
+        const username = configService.get('DB_USERNAME');
+        const password = configService.get('DB_PASSWORD');
+        const database = configService.get('DB_NAME');
+
+        if (!host || !port || !username || !password || !database) {
+          throw new Error('Database configuration is missing');
+        }
+
+        return {
+          type: 'postgres',
+          host,
+          port: parseInt(port, 10),
+          username,
+          password,
+          database,
+          entities: [Students, Admins, Courses],
+          synchronize: true,
+          logging: true,
+        };
+      },
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([Students, Admins, Courses]),
