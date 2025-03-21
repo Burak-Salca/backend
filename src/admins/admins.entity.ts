@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { UserRole } from '../_common/enums/auth.enums';
 
 @Entity()
 export class Admins {
@@ -17,7 +16,4 @@ export class Admins {
 
   @Column({ length: 255 })
   password: string;
-
-  @Column()
-  role: UserRole;
 } 

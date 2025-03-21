@@ -9,7 +9,8 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from './jwt.auth.guard';
 import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
-import { UserRole } from '../_common/enums/auth.enums';
+import { UserType } from 'src/_security/enums/type.enum';
+
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -34,7 +35,7 @@ export class AuthController {
   @Post('logout')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.STUDENT)
+  @Roles(UserType.ADMIN, UserType.STUDENT)
   async logout(@Req() req: ExpressRequest) {
     const token = req.headers['authorization']?.split(' ')[1];
     

@@ -3,19 +3,17 @@ import { INestApplication } from '@nestjs/common';
 
 export function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
-    .setTitle('Backend API')
-    .setDescription('API Documentation')
+    .setTitle('Kurs Yönetim API')
+    .setDescription('Kurs Yönetim Sistemi REST API')
     .setVersion('1.0')
     .addBearerAuth(
       {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
         in: 'header',
       },
-      'access-token',
+      'access-token'
     )
     .build();
 

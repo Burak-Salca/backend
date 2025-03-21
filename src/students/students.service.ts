@@ -7,7 +7,7 @@ import { UpdateStudentDTO } from './dto/request/update.student.dto';
 import { Courses } from '../courses/courses.entity';
 import * as bcrypt from 'bcrypt';
 import { BaseResponse } from '../_base/response/base.response';
-import { UserRole } from '../_common/enums/auth.enums';
+
 
 @Injectable()
 export class StudentsService {
@@ -35,7 +35,6 @@ export class StudentsService {
     const student = this.studentsRepository.create({
       ...rest,
       password: hashedPassword,
-      role: UserRole.STUDENT,
     });
     
     return this.studentsRepository.save(student);
@@ -43,7 +42,7 @@ export class StudentsService {
 
   async findAll(): Promise<Students[]> {
     return this.studentsRepository.find({
-      select: ['id', 'firstName', 'lastName', 'email', 'role'] // password hariç bilgileri getir
+      select: ['id', 'firstName', 'lastName', 'email', 'courses'] 
     });
   }
 
@@ -54,9 +53,7 @@ export class StudentsService {
     if (updateStudentDto.email && updateStudentDto.email !== student.email) {
       const existingStudent = await this.findByEmail(updateStudentDto.email);
       if (existingStudent) {
-        throw new ConflictException(
-          new BaseResponse(null, 'Bu email adresi zaten kullanımda', 409)
-        );
+        throw new ConflictException(new BaseResponse(null, 'Bu email adresi zaten kullanımda', 409));
       }
     }
 
@@ -87,7 +84,6 @@ export class StudentsService {
         firstName: true,
         lastName: true,
         email: true,
-        role: true,
         courses: true
       }
     });
@@ -113,7 +109,7 @@ export class StudentsService {
   async findByEmail(email: string): Promise<Students | null> {
     return this.studentsRepository.findOne({ 
       where: { email },
-      select: ['id', 'firstName', 'lastName', 'email', 'password', 'role'] // password dahil (login için)
+      select: ['id', 'firstName', 'lastName', 'email', 'password', 'courses'] 
     });
   }
 

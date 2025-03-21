@@ -7,7 +7,7 @@ import { BaseResponse } from '../_base/response/base.response';
 import { StudentsService } from 'src/students/students.service';
 import { LoginStudentDto } from './dto/request/login.student.dto';
 import { LoginAdminDto } from './dto/request/login.admin.dto';
-
+import { UserType } from '../_security/enums/type.enum';
 
 export const tokenBlacklist = new Set<string>();
 
@@ -21,73 +21,69 @@ export class AuthService {
 
   async register(registerAdminDto: RegisterAdminDto) {
     const admin = await this.adminsService.create(registerAdminDto);
-
-    return new BaseResponse({
-      id: admin.id,
-      firstName: admin.firstName,
-      lastName: admin.lastName,
-      email: admin.email,
-    }, 'Admin başarıyla kaydedildi', 201);
+    return new BaseResponse(admin, 'Admin başarıyla kaydedildi', 201);
   }
   
   async loginAdmin(loginAdminDto: LoginAdminDto) {
-    const { email, password } = loginAdminDto;
-    const admin = await this.adminsService.findByEmail(email);
-
-    if (!admin || !(await bcrypt.compare(password, admin.password))) {
-      return new BaseResponse(null, 'Geçersiz e-posta veya şifre', 401);
+    const admin = await this.adminsService.findByEmail(loginAdminDto.email);
+    if (!admin) {
+      throw new UnauthorizedException(new BaseResponse(null, 'Kullanıcı adı veya şifre hatalı', 401));
     }
 
-    const payload = { email: admin.email, sub: admin.id, type: 'admin' };
-    const accessToken = this.jwtService.sign(payload);
+    const isPasswordValid = await bcrypt.compare(loginAdminDto.password, admin.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(new BaseResponse(null, 'Kullanıcı adı veya şifre hatalı', 401));
+    }
 
-    return new BaseResponse({
-      access_token: accessToken,
-      admin: {
+    const payload = {
+      email: admin.email,
+      sub: admin.id,
+      type: UserType.ADMIN
+    };
+
+    const token = this.jwtService.sign(payload);
+
+    return {
+      access_token: token,
+      user: {
         id: admin.id,
+        email: admin.email,
         firstName: admin.firstName,
         lastName: admin.lastName,
-        email: admin.email,
-      },
-    }, 'Giriş başarılı', 200);
+        type: UserType.ADMIN
+      }
+    };
   }
 
   async loginStudent(loginStudentDto: LoginStudentDto) {
-    const { email, password } = loginStudentDto;
-    const student = await this.studentService.findByEmail(email);
-
-    if (!student || !(await bcrypt.compare(password, student.password))) {
-      return new BaseResponse(null, 'Geçersiz e-posta veya şifre', 401);
+    const student = await this.studentService.findByEmail(loginStudentDto.email);
+    if (!student) {
+      throw new UnauthorizedException(new BaseResponse(null, 'Kullanıcı adı veya şifre hatalı', 401));
     }
 
-    console.log('Student before token creation:', {
-      id: student.id,
-      email: student.email,
-      role: student.role
-    });
+    const isPasswordValid = await bcrypt.compare(loginStudentDto.password, student.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(new BaseResponse(null, 'Kullanıcı adı veya şifre hatalı', 401));
+    }
 
-    const payload = { 
-      email: student.email, 
+    const payload = {
+      email: student.email,
       sub: student.id,
-      type: 'student'
+      type: UserType.STUDENT
     };
 
-    console.log('Token payload:', payload);
+    const token = this.jwtService.sign(payload);
 
-    const accessToken = this.jwtService.sign(payload);
-
-    const decodedToken = this.jwtService.decode(accessToken);
-    console.log('Decoded token:', decodedToken);
-
-    return new BaseResponse({
-      access_token: accessToken,
-      student: {
+    return {
+      access_token: token,
+      user: {
         id: student.id,
+        email: student.email,
         firstName: student.firstName,
         lastName: student.lastName,
-        email: student.email,
-      },
-    }, 'Giriş başarılı', 200);
+        type: UserType.STUDENT
+      }
+    };
   }
 
   async logout(token: string) {

@@ -6,7 +6,7 @@ import { CreateAdminDto } from './dto/request/create.admin.dto';
 import { UpdateAdminDto } from './dto/request/update.admin.dto';
 import * as bcrypt from 'bcrypt';
 import { BaseResponse } from '../_base/response/base.response';
-import { UserRole } from '../_common/enums/auth.enums';
+
 
 @Injectable()
 export class AdminsService {
@@ -21,7 +21,6 @@ export class AdminsService {
     const admin = this.adminsRepository.create({
       ...rest,
       password: hashedPassword,
-      role: UserRole.ADMIN,
     });
     return this.adminsRepository.save(admin);
   }

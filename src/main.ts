@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { setupSwagger } from './_config/swagger.config';
+import { AppModule } from './app/app.module'; 
+import { setupSwagger } from './_config/swagger.config'; 
 import { ValidationPipe } from '@nestjs/common';
 
 import { CustomExceptionFilter } from './_common/exceptions/exception.filter';
@@ -15,7 +15,6 @@ async function bootstrap() {
   app.useGlobalFilters(new CustomExceptionFilter());
   app.enableCors();
 
-  // Swagger kurulumu
   setupSwagger(app);
 
   await app.listen(3001);
