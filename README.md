@@ -1,98 +1,134 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🎓 Öğrenci ve Ders Yönetimi Sistemi
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 📋 Proje Hakkında
+Bu proje, öğrenci ve ders yönetimini kapsayan kapsamlı bir web uygulamasıdır. Sistem, öğrencilerin derslere kaydolmasını, admin kullanıcıların öğrenci ve ders yönetimini yapmasını sağlayan modern bir platformdur.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📚 Kullanılan Kütüphaneler
 
-## Description
+### Ana Bağımlılıklar
+- 🏗️ **@nestjs/common** (^11.0.1) - NestJS çekirdek kütüphanesi
+- ⚙️ **@nestjs/config** (^4.0.1) - Konfigürasyon yönetimi
+- 🚀 **@nestjs/core** (^11.0.1) - NestJS ana modülü
+- 🔑 **@nestjs/jwt** (^11.0.0) - JWT (JSON Web Token) desteği
+- 🛡️ **@nestjs/passport** (^11.0.5) - Kimlik doğrulama stratejileri
+- 🌐 **@nestjs/platform-express** (^11.0.1) - Express entegrasyonu
+- 📝 **@nestjs/swagger** (^11.0.7) - API dokümantasyonu
+- 🗃️ **@nestjs/typeorm** (^11.0.0) - TypeORM entegrasyonu
+- 🔒 **bcrypt** (^5.1.1) - Şifreleme işlemleri
+- ✨ **class-transformer** (^0.5.1) - Nesne dönüşümleri
+- ✅ **class-validator** (^0.14.1) - Veri doğrulama
+- 🎫 **jsonwebtoken** (^9.0.2) - JWT işlemleri
+- 🔐 **passport** (^0.7.0) - Kimlik doğrulama
+- 🔑 **passport-jwt** (^4.0.1) - JWT stratejisi
+- 🐘 **pg** (^8.14.1) - PostgreSQL sürücüsü
+- 🔄 **typeorm** (^0.3.21) - ORM kütüphanesi
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 👥 Kullanıcı Rolleri ve Yetkiler
 
-## Project setup
+### 👨‍💼 Admin Rolü
+- ➕ Öğrenci ekleme, güncelleme ve silme
+- 📚 Ders ekleme, güncelleme ve silme
+- 🔄 Öğrenci-ders eşleştirmelerini yönetme
+- 📊 Tüm öğrenci ve ders listelerini görüntüleme
+- 📝 Sistem genelinde tam yetki
 
-```bash
-$ npm install
+### 👨‍🎓 Öğrenci Rolü
+- 📝 Kendi profilini görüntüleme ve güncelleme
+- 📚 Mevcut derslere kayıt olma
+- ❌ Kayıtlı derslerden çıkma
+- 📋 Kendi ders kayıtlarını görüntüleme
+
+## 🛠️ Kullanılan Teknolojiler
+
+### Backend
+- ⚡ NestJS (Node.js framework)
+- 🔐 JWT tabanlı kimlik doğrulama
+- 🎯 TypeScript
+- 📊 PostgreSQL veritabanı
+- 📝 Swagger API dokümantasyonu
+
+### Güvenlik
+- 🔒 JWT (JSON Web Tokens)
+- 👮‍♂️ Role-based access control (RBAC)
+- 🛡️ Guards ve decorators ile yetkilendirme
+- 🔑 Bcrypt ile şifreleme
+
+### Veritabanı
+- 🐘 PostgreSQL
+- 🔄 TypeORM ile veritabanı yönetimi
+
+### Test
+- 🧪 Jest test framework
+
+
+## 📁 Proje Mimarisi
+
+```
+src/
+├── _base/          # 🏗️ Temel sınıflar ve yapılar
+├── _config/        # ⚙️ Konfigürasyon dosyaları
+├── _security/      # 🔒 Güvenlik ile ilgili dosyalar
+├── admins/         # 👨‍💼 Admin modülü
+├── auth/           # 🔐 Kimlik doğrulama modülü
+├── courses/        # 📚 Ders modülü
+└── students/       # 👨‍🎓 Öğrenci modülü
 ```
 
-## Compile and run the project
+## 🚀 Kurulum ve Çalıştırma
 
+### 📋 Ön Gereksinimler
+- Node.js (v18 veya üzeri)
+- PostgreSQL
+- npm veya yarn
+
+### 🔧 Kurulum Adımları
+
+1. Projeyi klonlayın:
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone [repo-url]
+cd [proje-dizini]
 ```
 
-## Run tests
-
+2. Bağımlılıkları yükleyin:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
+3. `.env` dosyasını oluşturun:
+```env
+DB_TYPE=***
+DB_HOST=***
+DB_PORT=***
+DB_USERNAME=***
+DB_PASSWORD=***
+DB_NAME=***
+JWT_SECRET=***
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+4. Veritabanını oluşturun:
+```bash
+# PostgreSQL'de veritabanını oluşturun
+createdb DB_NAME
+```
 
-## Resources
+5. Uygulamayı başlatın:
+```bash
+# Geliştirme modu
+npm run start:dev
 
-Check out a few resources that may come in handy when working with NestJS:
+# Prodüksiyon modu
+npm run start:prod
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 🌐 API Endpoints
 
-## Support
+API dokümantasyonuna aşağıdaki URL'lerden erişebilirsiniz:
+- Swagger UI: `http://localhost:3000/api`
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 🔍 Test
 
-## Stay in touch
+```bash
+# Unit testleri çalıştır
+npm run test
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```
