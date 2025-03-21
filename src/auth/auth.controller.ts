@@ -4,7 +4,7 @@ import { LoginAdminDto } from './dto/request/login.admin.dto';
 import { LoginStudentDto } from './dto/request/login.student.dto';
 import { RegisterAdminDto } from './dto/request/register.admin.dto';
 import { BaseResponse } from '../_base/response/base.response';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../_security/guards/jwt.auth.guard';
 import { RolesGuard } from '../_security/guards/roles.guard';
@@ -18,8 +18,7 @@ export class AuthController {
 
   @Post('admin/register')
   async registerAdmin(@Body() registerAdminDto: RegisterAdminDto) {
-    const admin = await this.authService.register(registerAdminDto);
-    return new BaseResponse(admin, 'Admin başarıyla kaydedildi', 201);
+    return this.authService.register(registerAdminDto);
   }
 
   @Post('admin/login')
@@ -32,6 +31,7 @@ export class AuthController {
     return this.authService.loginStudent(loginStudentDto);
   }
 
+  @ApiBearerAuth('access-token')
   @Post('logout')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserType.ADMIN, UserType.STUDENT)
