@@ -1,27 +1,41 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
 import { AdminsService } from '../../admins/admins.service';
 import { StudentsService } from '../../students/students.service';
 import { BaseResponse } from '../../_base/response/base.response';
 import { tokenBlacklist } from '../../auth/auth.service';
 import { UserType } from '../enums/type.enum';
+import { Request } from 'express';
+
+interface JwtPayload {
+  sub: number;
+  email: string;
+  type: UserType;
+}
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly adminsService: AdminsService,
     private readonly studentsService: StudentsService,
+    private readonly configService: ConfigService,
   ) {
+    const jwtSecret = configService.get<string>('JWT_SECRET');
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'yourSecretKey',
-      passReqToCallback: true
-    });
+      secretOrKey: jwtSecret,
+      passReqToCallback: true,
+    } as any);
   }
 
-  async validate(req: any, payload: any) {
+  async validate(req: Request, payload: JwtPayload) {
     console.log('JWT Strategy - Incoming payload:', payload);
 
     const token = req.headers.authorization?.split(' ')[1];
