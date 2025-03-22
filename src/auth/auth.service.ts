@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AdminsService } from '../admins/admins.service';
 import { RegisterAdminDto } from './dto/request/register.admin.dto';
@@ -8,6 +8,7 @@ import { StudentsService } from '../students/students.service';
 import { LoginStudentDto } from './dto/request/login.student.dto';
 import { LoginAdminDto } from './dto/request/login.admin.dto';
 import { UserType } from '../_security/enums/type.enum';
+import { RegisterStudentDto } from './dto/request/register.student.dto';
 
 export const tokenBlacklist = new Set<string>();
 
@@ -89,6 +90,11 @@ export class AuthService {
   async logout(token: string) {
     tokenBlacklist.add(token);
     return new BaseResponse(null, 'Başarıyla çıkış yapıldı', 200);
+  }
+
+  async registerStudent(registerStudentDto: RegisterStudentDto) {
+    const student = await this.studentService.create(registerStudentDto);
+    return new BaseResponse(student, 'Öğrenci başarıyla kaydedildi', 201);
   }
 
 }

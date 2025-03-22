@@ -6,17 +6,10 @@ import { JwtAuthGuard } from '../_security/guards/jwt.auth.guard';
 import { RolesGuard } from '../_security/guards/roles.guard';
 import { Roles } from '../_security/decorators/roles.decorator';
 import { BaseResponse } from '../_base/response/base.response';
-import { Request } from 'express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UserType } from '../_security/enums/type.enum';
-
-interface RequestWithUser extends Request {
-  user: {
-    sub: number;
-    email: string;
-    type: string;
-  }
-}
+import { StudentCourseRelation } from './interfaces/student-course-relation.interface';
+import { RequestWithUser } from './interfaces/request-with-user.interface';
 
 @ApiTags('Students')
 @ApiBearerAuth('access-token')
@@ -105,6 +98,13 @@ export class StudentsController {
     return new BaseResponse(students, 'Öğrenciler başarıyla listelendi', 200);
   }
 
+  @Get(':id')
+  @Roles(UserType.ADMIN)
+  async findOne(@Param('id') id: number) {
+    const student = await this.studentsService.findById(id);
+    return new BaseResponse(student, 'Öğrenci başarıyla getirildi', 200);
+  }
+
   @Patch(':id')
   @Roles(UserType.ADMIN)
   async updateStudent(@Param('id') id: number, @Body() updateStudentDto: UpdateStudentDTO) {
@@ -144,5 +144,12 @@ export class StudentsController {
   async getStudentCoursesById(@Param('studentId') studentId: number) {
     const courses = await this.studentsService.getStudentCourses(studentId);
     return new BaseResponse(courses, `${studentId} ID'li öğrencinin dersleri başarıyla listelendi`, 200);
+  }
+
+  @Get('admin/student-course-relations')
+  @Roles(UserType.ADMIN)
+  async getAllStudentCourseRelations(): Promise<BaseResponse<StudentCourseRelation[]>> {
+    const relations = await this.studentsService.getAllStudentCourseRelations();
+    return new BaseResponse(relations, 'Öğrenci-ders eşleşmeleri başarıyla listelendi', 200);
   }
 }

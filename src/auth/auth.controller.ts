@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { LoginAdminDto } from './dto/request/login.admin.dto';
 import { LoginStudentDto } from './dto/request/login.student.dto';
 import { RegisterAdminDto } from './dto/request/register.admin.dto';
+import { RegisterStudentDto } from './dto/request/register.student.dto';
 import { BaseResponse } from '../_base/response/base.response';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -19,6 +20,11 @@ export class AuthController {
   @Post('admin/register')
   async registerAdmin(@Body() registerAdminDto: RegisterAdminDto) {
     return this.authService.register(registerAdminDto);
+  }
+
+  @Post('student/register')
+  async registerStudent(@Body() registerStudentDto: RegisterStudentDto) {
+    return this.authService.registerStudent(registerStudentDto);
   }
 
   @Post('admin/login')

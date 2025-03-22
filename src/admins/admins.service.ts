@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admins } from './admins.entity';
@@ -39,6 +39,14 @@ export class AdminsService {
 
   async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admins> {
     const admin = await this.findById(id);
+    const existingAdmin = await this.findByEmail(updateAdminDto.email);
+    if (existingAdmin) {
+      throw new ConflictException(
+        new BaseResponse(null, 'Bu email adresi zaten kullanımda', 409)
+      );
+    }
+    updateAdminDto.password = await bcrypt.hash(updateAdminDto.password, 10);
+    
     Object.assign(admin, updateAdminDto);
     return this.adminsRepository.save(admin);
   }

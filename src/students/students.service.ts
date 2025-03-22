@@ -7,7 +7,7 @@ import { UpdateStudentDTO } from './dto/request/update.student.dto';
 import { Courses } from '../courses/courses.entity';
 import * as bcrypt from 'bcrypt';
 import { BaseResponse } from '../_base/response/base.response';
-
+import { StudentCourseRelation } from './interfaces/student-course-relation.interface';
 
 @Injectable()
 export class StudentsService {
@@ -191,5 +191,36 @@ export class StudentsService {
     }
 
     return student.courses;
+  }
+
+  async getAllStudentCourseRelations(): Promise<StudentCourseRelation[]> {
+    const relations = await this.studentsRepository
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.courses', 'course')
+      .select([
+        'student.id',
+        'student.firstName',
+        'student.lastName',
+        'course.id',
+        'course.name'
+      ])
+      .getMany();
+
+    const formattedRelations: StudentCourseRelation[] = [];
+    
+    for (const student of relations) {
+      if (student.courses && student.courses.length > 0) {
+        for (const course of student.courses) {
+          formattedRelations.push({
+            studentId: student.id,
+            studentName: `${student.firstName} ${student.lastName}`,
+            courseId: course.id,
+            courseName: course.name
+          });
+        }
+      }
+    }
+
+    return formattedRelations;
   }
 }
