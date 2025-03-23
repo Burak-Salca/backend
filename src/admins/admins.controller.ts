@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, Patch, UsePipes, ValidationPipe, HttpStatus, UseGuards } from '@nestjs/common';
 import { AdminsService } from './admins.service';
 import { CreateAdminDto } from './dto/request/create.admin.dto';
 import { UpdateAdminDto } from './dto/request/update.admin.dto';
@@ -38,7 +38,7 @@ export class AdminsController {
     return new BaseResponse(admin, 'Admin başarıyla bulundu', HttpStatus.OK);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @Roles(UserType.ADMIN)
   @UsePipes(ValidationPipe)
   async update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
