@@ -39,14 +39,22 @@ export class AdminsService {
 
   async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admins> {
     const admin = await this.findById(id);
-    const existingAdmin = await this.findByEmail(updateAdminDto.email);
-    if (existingAdmin) {
-      throw new ConflictException(
-        new BaseResponse(null, 'Bu email adresi zaten kullanımda', 409)
-      );
-    }
-    updateAdminDto.password = await bcrypt.hash(updateAdminDto.password, 10);
     
+    // Email güncellenmek isteniyorsa ve yeni email başka bir adminde varsa hata ver
+    if (updateAdminDto.email && updateAdminDto.email !== admin.email) {
+      const existingAdmin = await this.findByEmail(updateAdminDto.email);
+      if (existingAdmin && existingAdmin.id !== id) {
+        throw new ConflictException(
+          new BaseResponse(null, 'Bu email adresi zaten kullanımda', 409)
+        );
+      }
+    }
+
+    // Şifre güncellenmek isteniyorsa hashle
+    if (updateAdminDto.password) {
+      updateAdminDto.password = await bcrypt.hash(updateAdminDto.password, 10);
+    }
+
     Object.assign(admin, updateAdminDto);
     return this.adminsRepository.save(admin);
   }
