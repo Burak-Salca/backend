@@ -20,7 +20,6 @@ export class UpdateAdminDto {
   @IsOptional()
   @IsEmail({}, { message: 'Geçerli bir email adresi girin' })
   @Length(1, 100, { message: 'Email en fazla 100 karakter olabilir' })
-  @Matches(/^(?!\s*$).+/, { message: 'Email boş olamaz' })
   email?: string;
 
   @ApiProperty({ required: false })

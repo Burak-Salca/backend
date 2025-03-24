@@ -6,10 +6,11 @@ import { JwtAuthGuard } from '../_security/guards/jwt.auth.guard';
 import { RolesGuard } from '../_security/guards/roles.guard';
 import { Roles } from '../_security/decorators/roles.decorator';
 import { BaseResponse } from '../_base/response/base.response';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserType } from '../_security/enums/type.enum';
 import { StudentCourseRelation } from './interfaces/student-course-relation.interface';
-import { RequestWithUser } from './interfaces/request-with-user.interface';
+import { RequestUser } from '../_base/interfaces/request.user.interface';
+
 
 @ApiTags('Students')
 @ApiBearerAuth('access-token')
@@ -20,72 +21,47 @@ export class StudentsController {
   
   @Get('profile')
   @Roles(UserType.STUDENT)
-  async getProfile(@Req() req: RequestWithUser) {
-    /*console.log('JWT User Info:', {
-      id: req.user.sub,
-      email: req.user.email,
-      type: req.user.type
-    });*/
-
-    const student = await this.studentsService.findById(req.user.sub);
-    /*console.log('Found Student:', {
-      id: student.id,
-      email: student.email,
-      firstName: student.firstName,
-      lastName: student.lastName
-    });*/
-
+  @ApiOperation({ summary: 'Öğrenci Profili', description: 'Öğrenci kendi profil bilgilerini görüntüleyebilir.' })
+  async getProfile(@Req() req: RequestUser) {
+    const student = await this.studentsService.findById(req.user.id);
     return new BaseResponse(student, 'Profil bilgileri getirildi', 200);
   }
 
   @Patch('profile/update')
   @Roles(UserType.STUDENT)    
-  async updateProfile(@Req() req: RequestWithUser, @Body() updateStudentDto: UpdateStudentDTO) {
-    /*console.log('Update Profile - User Info:', {
-      sub: req.user.sub,
-      email: req.user.email,
-      type: req.user.type,
-    });*/
-
-    const student = await this.studentsService.update(req.user.sub, updateStudentDto);
+  @ApiOperation({ summary: 'Profil Güncelle', description: 'Öğrenci kendi profil bilgilerini güncelleyebilir.' })
+  async updateProfile(@Req() req: RequestUser, @Body() updateStudentDto: UpdateStudentDTO) {
+    const student = await this.studentsService.update(req.user.id, updateStudentDto);
     return new BaseResponse(student, 'Profil bilgileri güncellendi', 200);
   }
 
   @Get('profile/myCourses')
   @Roles(UserType.STUDENT)
-  async getStudentCourses(@Req() req: RequestWithUser) {
-    /*console.log('JWT User Info for Courses:', {
-      id: req.user.sub,
-      email: req.user.email,
-      type: req.user.type
-    });*/
-
-    const courses = await this.studentsService.getStudentCourses(req.user.sub);
-    /*console.log('Found Courses for Student:', {
-      studentId: req.user.sub,
-      coursesCount: courses.length,
-      courses: courses.map(c => ({ id: c.id, name: c.name }))
-    });*/
-
+  @ApiOperation({ summary: 'Kurslarım', description: 'Öğrenci kendi kayıtlı olduğu kursları listeleyebilir.' })
+  async getStudentCourses(@Req() req: RequestUser) {
+    const courses = await this.studentsService.getStudentCourses(req.user.id);
     return new BaseResponse(courses, 'Kurslarınız başarıyla listelendi', 200);
   }
 
   @Post('profile/courses/:courseId')
   @Roles(UserType.STUDENT)
-  async enrollCourse(@Req() req: RequestWithUser, @Param('courseId') courseId: number) {
-    const student = await this.studentsService.addCourse(req.user.sub, courseId);
+  @ApiOperation({ summary: 'Kursa Kayıt Ol', description: 'Öğrenci bir kursa kayıt olabilir.' })
+  async enrollCourse(@Req() req: RequestUser, @Param('courseId') courseId: number) {
+    const student = await this.studentsService.addCourse(req.user.id, courseId);
     return new BaseResponse(student, 'Kursa başarıyla kaydoldunuz', 200);
   }
 
   @Delete('profile/courses/:courseId')
   @Roles(UserType.STUDENT)
-  async unenrollCourse(@Req() req: RequestWithUser, @Param('courseId') courseId: number) {
-    const removedCourse = await this.studentsService.removeCourse(req.user.sub, courseId);
+  @ApiOperation({ summary: 'Kurs Kaydını Sil', description: 'Öğrenci bir kurstan kaydını silebilir.' })
+  async unenrollCourse(@Req() req: RequestUser, @Param('courseId') courseId: number) {
+    const removedCourse = await this.studentsService.removeCourse(req.user.id, courseId);
     return new BaseResponse(removedCourse, 'Kurs kaydınız başarıyla silindi', 200);
   }
 
   @Post()
   @Roles(UserType.ADMIN)
+  @ApiOperation({ summary: 'Yeni Öğrenci Oluştur', description: 'Admin yeni bir öğrenci oluşturabilir.' })
   async create(@Body() createStudentDto: CreateStudentDto) {
     const student = await this.studentsService.create(createStudentDto);
     return new BaseResponse(student, 'Öğrenci başarıyla oluşturuldu', 201);
@@ -93,54 +69,55 @@ export class StudentsController {
 
   @Get()
   @Roles(UserType.ADMIN)
+  @ApiOperation({ summary: 'Tüm Öğrencileri Listele', description: 'Admin tüm öğrencileri listeleyebilir.' })
   async findAll() {
     const students = await this.studentsService.findAll();
     return new BaseResponse(students, 'Öğrenciler başarıyla listelendi', 200);
   }
 
-  @Get(':id')
+  @Get(':studentId')
   @Roles(UserType.ADMIN)
-  async findOne(@Param('id') id: number) {
-    const student = await this.studentsService.findById(id);
+  @ApiOperation({ summary: 'Öğrenci Detayı', description: 'Admin bir öğrencinin detayını görüntüleyebilir.' })
+  async findOne(@Param('studentId') studentId: number) {
+    const student = await this.studentsService.findById(studentId);
     return new BaseResponse(student, 'Öğrenci başarıyla getirildi', 200);
   }
 
-  @Patch(':id')
+  @Patch(':studentId')
   @Roles(UserType.ADMIN)
-  async updateStudent(@Param('id') id: number, @Body() updateStudentDto: UpdateStudentDTO) {
-    const student = await this.studentsService.update(id, updateStudentDto);
+  @ApiOperation({ summary: 'Öğrenci Güncelle', description: 'Admin bir öğrenciyi güncelleyebilir.' })
+  async updateStudent(@Param('studentId') studentId: number, @Body() updateStudentDto: UpdateStudentDTO) {
+    const student = await this.studentsService.update(studentId, updateStudentDto);
     return new BaseResponse(student, 'Öğrenci bilgileri güncellendi', 200);
   }
 
-  @Delete(':id')
+  @Delete(':studentId')
   @Roles(UserType.ADMIN)
-  async remove(@Param('id') id: number) {
-    const student = await this.studentsService.remove(id);
+  @ApiOperation({ summary: 'Öğrenci Sil', description: 'Admin bir öğrenciyi silebilir.' })
+  async remove(@Param('studentId') studentId: number) {
+    const student = await this.studentsService.remove(studentId);
     return new BaseResponse(student, 'Öğrenci başarıyla silindi', 200);
   }
 
   @Post(':studentId/admin/courses/:courseId')
   @Roles(UserType.ADMIN)
-  async adminAddCourse(
-    @Param('studentId') studentId: number,
-    @Param('courseId') courseId: number
-  ) {
+  @ApiOperation({ summary: 'Öğrenciye Kurs Ekle', description: 'Admin bir öğrenciye kurs ekleyebilir.' })
+  async adminAddCourse(@Param('studentId') studentId: number,@Param('courseId') courseId: number) {
     const student = await this.studentsService.addCourse(studentId, courseId);
     return new BaseResponse(student, 'Öğrenciye ders başarıyla atandı', 200);
   }
 
   @Delete(':studentId/admin/courses/:courseId')
   @Roles(UserType.ADMIN)
-  async adminRemoveCourse(
-    @Param('studentId') studentId: number,
-    @Param('courseId') courseId: number
-  ) {
+  @ApiOperation({ summary: 'Öğrenciden Kurs Sil', description: 'Admin bir öğrencinin kurs kaydını silebilir.' })
+  async adminRemoveCourse(@Param('studentId') studentId: number, @Param('courseId') courseId: number) {
     const removedCourse = await this.studentsService.removeCourse(studentId, courseId);
     return new BaseResponse(removedCourse, 'Öğrencinin ders kaydı silindi', 200);
   }
 
   @Get(':studentId/courses')
   @Roles(UserType.ADMIN)
+  @ApiOperation({ summary: 'Öğrencinin Kurslarını Listele', description: 'Admin bir öğrencinin kayıtlı olduğu kursları listeleyebilir.' })
   async getStudentCoursesById(@Param('studentId') studentId: number) {
     const courses = await this.studentsService.getStudentCourses(studentId);
     return new BaseResponse(courses, `${studentId} ID'li öğrencinin dersleri başarıyla listelendi`, 200);
@@ -148,6 +125,7 @@ export class StudentsController {
 
   @Get('admin/student-course-relations')
   @Roles(UserType.ADMIN)
+  @ApiOperation({ summary: 'Öğrenci-Kurs İlişkilerini Listele', description: 'Admin tüm öğrenci-kurs ilişkilerini listeleyebilir.' })
   async getAllStudentCourseRelations(): Promise<BaseResponse<StudentCourseRelation[]>> {
     const relations = await this.studentsService.getAllStudentCourseRelations();
     return new BaseResponse(relations, 'Öğrenci-ders eşleşmeleri başarıyla listelendi', 200);
