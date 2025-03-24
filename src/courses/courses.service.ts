@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Courses } from './courses.entity';
@@ -28,7 +28,7 @@ export class CoursesService {
   async findOne(id: number): Promise<Courses> {
     const course = await this.coursesRepository.findOneBy({ id });
     if (!course) {
-      throw new NotFoundException('Kurs bulunamadı');
+      throw new NotFoundException(new BaseResponse(null, `Kurs bulunamadı`, 404));
     }
     return course;
   }
@@ -52,13 +52,12 @@ export class CoursesService {
     });
 
     if (!course) {
-      throw new NotFoundException(new BaseResponse(null, `${courseId} id nolu ders bulunamadı`, 404));
+      throw new NotFoundException(new BaseResponse(null, `Ders bulunamadı`, 404));
     }
 
     if (!course.students || course.students.length === 0) {
-      throw new NotFoundException(new BaseResponse(null, `${courseId} id nolu dersin öğrenci kaydı yok`, 404));
+      throw new NotFoundException(new BaseResponse(null, `Seçili dersin öğrenci kaydı yok`, 404));
     }
-
     return course.students;
   }
 } 

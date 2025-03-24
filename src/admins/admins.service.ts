@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admins } from './admins.entity';
@@ -40,16 +40,6 @@ export class AdminsService {
   async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admins> {
     const admin = await this.findById(id);
     
-    // Email güncellenmek isteniyorsa ve yeni email başka bir adminde varsa hata ver
-    if (updateAdminDto.email && updateAdminDto.email !== admin.email) {
-      const existingAdmin = await this.findByEmail(updateAdminDto.email);
-      if (existingAdmin && existingAdmin.id !== id) {
-        throw new ConflictException(
-          new BaseResponse(null, 'Bu email adresi zaten kullanımda', 409)
-        );
-      }
-    }
-
     // Şifre güncellenmek isteniyorsa hashle
     if (updateAdminDto.password) {
       updateAdminDto.password = await bcrypt.hash(updateAdminDto.password, 10);
@@ -59,12 +49,18 @@ export class AdminsService {
     return this.adminsRepository.save(admin);
   }
 
-  async remove(id: number): Promise<Admins> {
+  async remove(id: number, loggedInUserId: number): Promise<Admins> {
+    //Giriş yapan adminin kendisini silemez
+    if (id === loggedInUserId) {
+      throw new ForbiddenException(new BaseResponse(null, 'Kendinizi silemezsiniz', 403));
+    }
+
     const admin = await this.findById(id);
     await this.adminsRepository.remove(admin);
     return admin;
   }
 
+  //Login adminde email kontrolü için kullanılmak için oluşturuldu
   async findByEmail(email: string): Promise<Admins | null> {
     return this.adminsRepository.findOne({ where: { email } });
   }

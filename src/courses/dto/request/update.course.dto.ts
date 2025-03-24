@@ -1,14 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, Matches } from 'class-validator';
 
 export class UpdateCourseDto {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
-  @IsNotEmpty({ message: 'Kurs adı boş olamaz' })
-  name: string;
+  @IsOptional()
+  @Matches(/^(?!\s*$).+/, { message: 'Kurs adı boş olamaz' })
+  name?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
-  @IsNotEmpty({ message: 'Kurs içeriği boş olamaz' })
-  content: string;
+  @IsOptional()
+  @Matches(/^(?!\s*$).+/, { message: 'Kurs içeriği boş olamaz' })
+  content?: string;
 } 
