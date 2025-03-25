@@ -127,33 +127,31 @@ export class StudentsService {
   }
 
   async getAllStudentCourseRelations(): Promise<StudentCourseRelation[]> {
-    const relations = await this.studentsRepository
-      .createQueryBuilder('student')
-      .leftJoinAndSelect('student.courses', 'course')
-      .select([
-        'student.id',
-        'student.firstName',
-        'student.lastName',
-        'course.id',
-        'course.name'
-      ])
-      .getMany();
 
-    const formattedRelations: StudentCourseRelation[] = [];
-    
-    for (const student of relations) {
-      if (student.courses && student.courses.length > 0) {
-        for (const course of student.courses) {
-          formattedRelations.push({
-            studentId: student.id,
-            studentName: `${student.firstName} ${student.lastName}`,
-            courseId: course.id,
-            courseName: course.name
-          });
+    let allRelations: StudentCourseRelation[] = [];
+
+    //Önce bütün öğrencileri getiriyoruz
+    const allStudents = await this.studentsRepository.find({
+        select: ['id', 'firstName', 'lastName']
+    });
+
+  
+    for (let student of allStudents) {
+        
+        //Listelenen her öğrenci için dersleri getiriyoruz
+        const studentCourses = await this.getStudentCourses(student.id);
+
+        for (let course of studentCourses) {
+            //Listelenen her ders için yeni bir obje oluşturuyoruz
+            const newRelation = {
+                studentId: student.id,
+                studentName: student.firstName + ' ' + student.lastName,
+                courseId: course.id,
+                courseName: course.name
+            };
+            allRelations.push(newRelation);
         }
-      }
     }
-
-    return formattedRelations;
+    return allRelations;
   }
 }
