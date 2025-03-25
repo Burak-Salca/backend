@@ -8,12 +8,7 @@ import { BaseResponse } from '../../_base/response/base.response';
 import { tokenBlacklist } from '../../auth/auth.service';
 import { UserType } from '../enums/type.enum';
 import { Request } from 'express';
-
-interface JwtPayload {
-  sub: number;
-  email: string;
-  type: UserType;
-}
+import { JwtPayload } from '../../_base/interfaces/jwt.payload.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {

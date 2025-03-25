@@ -8,7 +8,7 @@ import { Roles } from '../_security/decorators/roles.decorator';
 import { BaseResponse } from '../_base/response/base.response';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserType } from '../_security/enums/type.enum';
-import { StudentCourseRelation } from './interfaces/student-course-relation.interface';
+import { StudentCourseRelation } from '../_base/interfaces/student.course.relation.interface';
 import { RequestUser } from '../_base/interfaces/request.user.interface';
 
 

@@ -7,7 +7,7 @@ import { UpdateStudentDTO } from './dto/request/update.student.dto';
 import { Courses } from '../courses/courses.entity';
 import * as bcrypt from 'bcrypt';
 import { BaseResponse } from '../_base/response/base.response';
-import { StudentCourseRelation } from './interfaces/student-course-relation.interface';
+import { StudentCourseRelation } from '../_base/interfaces/student.course.relation.interface';
 
 @Injectable()
 export class StudentsService {
