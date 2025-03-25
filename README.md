@@ -131,6 +131,7 @@ src/
 ### 📋 Ön Gereksinimler
 - Node.js (v18 veya üzeri)
 - Docker ve Docker Compose
+- DBeaver
 - npm veya yarn
 - PostgreSQL (Docker kullanmıyorsanız)
 
@@ -182,17 +183,17 @@ npm run start:dev
 ```
 
 5. DBeaver ile Bağlantı
-Docker'daki PostgreSQL veritabanına DBeaver ile bağlanmak için:
+-Docker'daki PostgreSQL veritabanına DBeaver ile bağlanmak için:
 
-1. DBeaver'i açın
-2. "New Database Connection" butonuna tıklayın
-3. PostgreSQL'i seçin
-4. .env dosyanızda belirlediğiniz bağlantı bilgilerini girin:
-   - Host: DB_HOST
-   - Port: DB_PORT
-   - Database: DB_NAME
-   - Username: DB_USERNAME
-   - Password: DB_PASSWORD
+--1. DBeaver'i açın
+--2. "New Database Connection" butonuna tıklayın
+--3. PostgreSQL'i seçin
+--4. .env dosyanızda belirlediğiniz bağlantı bilgilerini girin:
+   --- Host: DB_HOST
+   --- Port: DB_PORT
+   --- Database: DB_NAME
+   --- Username: DB_USERNAME
+   --- Password: DB_PASSWORD
 
 
 ### 🌐 API Endpoints
