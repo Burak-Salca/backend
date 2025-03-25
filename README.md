@@ -165,6 +165,11 @@ JWT_SECRET=***
 # Docker container'larını başlat
 docker-compose up -d
 
+# Uygulamayı başlat
+npm run start:dev
+
+💡 **Not**: Docker container'ı çalışırken yerel PostgreSQL servisinin durdurulmuş olması önemlidir.
+
 ```
 
 #### B) Yerel Geliştirme Ortamında Çalıştırma:
@@ -176,16 +181,19 @@ createdb your_database_name
 npm run start:dev
 ```
 
-### 🐳 Docker Komutları
+5. DBeaver ile Bağlantı
+Docker'daki PostgreSQL veritabanına DBeaver ile bağlanmak için:
 
-```bash
-# Container'ları başlat
-docker-compose up -d
+1. DBeaver'i açın
+2. "New Database Connection" butonuna tıklayın
+3. PostgreSQL'i seçin
+4. .env dosyanızda belirlediğiniz bağlantı bilgilerini girin:
+   - Host: DB_HOST
+   - Port: DB_PORT
+   - Database: DB_NAME
+   - Username: DB_USERNAME
+   - Password: DB_PASSWORD
 
-# Container'ları durdur
-docker-compose down
-
-```
 
 ### 🌐 API Endpoints
 
@@ -199,7 +207,3 @@ API dokümantasyonuna aşağıdaki URL'den erişebilirsiniz:
 npm run test
 
 ```
-
-
-
-
