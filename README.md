@@ -183,12 +183,12 @@ npm run start:dev
 ```
 
 5. DBeaver ile Bağlantı
-Docker üzerinden çalışan PostgreSQL veritabanına DBeaver ile bağlanmak için aşağıdaki adımları izleyin:
+-Docker üzerinden çalışan PostgreSQL veritabanına DBeaver ile bağlanmak için aşağıdaki adımları izleyin:
 
-1. **DBeaver** uygulamasını açın.  
-2. Sol üstteki **"New Database Connection"** butonuna tıklayın.  
-3. Açılan pencerede **PostgreSQL** veritabanı türünü seçin ve **Next** butonuna tıklayın.  
-4. Aşağıdaki bilgileri, `.env` dosyanızda tanımladığınız değerlere göre doldurun:
+-1. **DBeaver** uygulamasını açın.  
+-2. Sol üstteki **"New Database Connection"** butonuna tıklayın.  
+-3. Açılan pencerede **PostgreSQL** veritabanı türünü seçin ve **Next** butonuna tıklayın.  
+-4. Aşağıdaki bilgileri, `.env` dosyanızda tanımladığınız değerlere göre doldurun:
 
    - **Host**: `DB_HOST`  
    - **Port**: `DB_PORT`  
