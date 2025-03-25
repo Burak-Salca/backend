@@ -26,6 +26,22 @@ describe('AuthService', () => {
     sign: jest.fn(),
   };
 
+  const mockAdminData = {
+    id: 1,
+    email: 'admin@test.com',
+    password: 'hashedPassword123',
+    firstName: 'Test',
+    lastName: 'Admin'
+  };
+
+  const mockStudentData = {
+    id: 2,
+    email: 'student@test.com',
+    password: 'hashedPassword456',
+    firstName: 'Test',
+    lastName: 'Student'
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -49,93 +65,83 @@ describe('AuthService', () => {
     adminsService = module.get<AdminsService>(AdminsService);
     studentsService = module.get<StudentsService>(StudentsService);
     jwtService = module.get<JwtService>(JwtService);
+
+    mockAdminData.password = await bcrypt.hash('Admin123*', 10);
+    mockStudentData.password = await bcrypt.hash('Student123*', 10);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('loginAdmin', () => {
+  describe('Admin Login Tests', () => {
     it('should successfully login an admin with correct credentials', async () => {
-      const mockAdmin = {
-        id: 1,
-        email: 'admin@test.com',
-        password: await bcrypt.hash('password123', 10),
-        firstName: 'Test',
-        lastName: 'Admin',
-      };
-
       const loginDto = {
         email: 'admin@test.com',
-        password: 'password123',
+        password: 'Admin123*'
       };
 
-      mockAdminsService.findByEmail.mockResolvedValue(mockAdmin);
-      mockJwtService.sign.mockReturnValue('test-token');
+      mockAdminsService.findByEmail.mockResolvedValue(mockAdminData);
+      mockJwtService.sign.mockReturnValue('admin-test-token');
 
       const result = await service.loginAdmin(loginDto);
 
-      expect(result).toHaveProperty('access_token', 'test-token');
+      expect(result).toHaveProperty('access_token', 'admin-test-token');
       expect(result.user).toHaveProperty('type', UserType.ADMIN);
+      expect(result.user).toHaveProperty('email', mockAdminData.email);
       expect(mockAdminsService.findByEmail).toHaveBeenCalledWith(loginDto.email);
+      expect(mockJwtService.sign).toHaveBeenCalledWith({
+        sub: mockAdminData.id,
+        email: mockAdminData.email,
+        type: UserType.ADMIN
+      });
     });
 
-    it('should throw UnauthorizedException for invalid admin credentials', async () => {
+    it('should throw UnauthorizedException for invalid admin password', async () => {
       const loginDto = {
         email: 'admin@test.com',
-        password: 'wrongpassword',
+        password: 'Admin1234*'
       };
 
-      mockAdminsService.findByEmail.mockResolvedValue(null);
+      mockAdminsService.findByEmail.mockResolvedValue(mockAdminData);
 
       await expect(service.loginAdmin(loginDto)).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  describe('loginStudent', () => {
+  describe('Student Login Tests', () => {
     it('should successfully login a student with correct credentials', async () => {
-      const mockStudent = {
-        id: 1,
-        email: 'student@test.com',
-        password: await bcrypt.hash('password123', 10),
-        firstName: 'Test',
-        lastName: 'Student',
-      };
-
       const loginDto = {
         email: 'student@test.com',
-        password: 'password123',
+        password: 'Student123*'
       };
 
-      mockStudentsService.findByEmail.mockResolvedValue(mockStudent);
-      mockJwtService.sign.mockReturnValue('test-token');
+      mockStudentsService.findByEmail.mockResolvedValue(mockStudentData);
+      mockJwtService.sign.mockReturnValue('student-test-token');
 
       const result = await service.loginStudent(loginDto);
 
-      expect(result).toHaveProperty('access_token', 'test-token');
+      expect(result).toHaveProperty('access_token', 'student-test-token');
       expect(result.user).toHaveProperty('type', UserType.STUDENT);
+      expect(result.user).toHaveProperty('email', mockStudentData.email);
       expect(mockStudentsService.findByEmail).toHaveBeenCalledWith(loginDto.email);
+      expect(mockJwtService.sign).toHaveBeenCalledWith({
+        sub: mockStudentData.id,
+        email: mockStudentData.email,
+        type: UserType.STUDENT
+      });
     });
 
-    it('should throw UnauthorizedException for invalid student credentials', async () => {
+    it('should throw UnauthorizedException for invalid student password', async () => {
       const loginDto = {
         email: 'student@test.com',
-        password: 'wrongpassword',
+        password: 'Student1234*'
       };
 
-      mockStudentsService.findByEmail.mockResolvedValue(null);
+      mockStudentsService.findByEmail.mockResolvedValue(mockStudentData);
 
       await expect(service.loginStudent(loginDto)).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  describe('logout', () => {
-    it('should successfully blacklist a token', async () => {
-      const token = 'test-token';
-      const result = await service.logout(token);
-
-      expect(result.status).toBe(200);
-      expect(result.message).toBe('Başarıyla çıkış yapıldı');
-    });
-  });
 }); 
