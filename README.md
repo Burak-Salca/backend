@@ -137,18 +137,18 @@ src/
 
 ### 🔧 Kurulum Adımları
 
-1. Projeyi klonlayın:
+## 1. Projeyi klonlayın:
 ```bash
 git clone [repo-url]
 cd [proje-dizini]
 ```
 
-2. Bağımlılıkları yükleyin:
+## 2. Bağımlılıkları yükleyin:
 ```bash
 npm install
 ```
 
-3. `.env` dosyasını oluşturun:
+## 3. `.env` dosyasını oluşturun:
 ```env
 DB_TYPE=***
 DB_HOST=***
@@ -159,7 +159,7 @@ DB_NAME=***
 JWT_SECRET=***
 ```
 
-4. Uygulamayı başlatmanın iki yolu var:
+## 4. Uygulamayı başlatmanın iki yolu var:
 
 #### A) Docker ile Çalıştırma (Önerilen):
 ```bash
@@ -182,8 +182,8 @@ createdb your_database_name
 npm run start:dev
 ```
 
-5. DBeaver ile Bağlantı
--Docker üzerinden çalışan PostgreSQL veritabanına DBeaver ile bağlanmak için aşağıdaki adımları izleyin:
+## 5. DBeaver ile Bağlantı
+Docker üzerinden çalışan PostgreSQL veritabanına DBeaver ile bağlanmak için aşağıdaki adımları izleyin:
 
 -1. **DBeaver** uygulamasını açın.  
 -2. Sol üstteki **"New Database Connection"** butonuna tıklayın.  
