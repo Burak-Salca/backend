@@ -3,7 +3,7 @@ name: student-management
 
 services:
   postgres:
-    container_name: student_management_db
+    container_name: ${DB_NAME}_container
     image: postgres:15
     ports:
       - "${DB_PORT}:5432"

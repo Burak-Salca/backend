@@ -3,9 +3,68 @@
 ## 📋 Proje Hakkında
 Bu proje, öğrenci ve ders yönetimini kapsayan kapsamlı bir web uygulamasıdır. Sistem, öğrencilerin derslere kaydolmasını, admin kullanıcıların öğrenci ve ders yönetimini yapmasını sağlayan modern bir platformdur.
 
-## 📚 Kullanılan Kütüphaneler
+## 👥 Kullanıcı Rolleri ve Yetkiler
 
-### Ana Bağımlılıklar
+### 👨‍💼 Admin Rolü
+- ➕ Öğrenci ekleme, güncelleme ve silme
+- 📚 Ders ekleme, güncelleme ve silme
+- 🔄 Öğrenci-ders eşleştirmelerini yönetme
+- 📊 Tüm öğrenci ve ders listelerini görüntüleme
+- 📝 Sistem genelinde tam yetki
+
+### 👨‍🎓 Öğrenci Rolü
+- 📝 Kendi profilini görüntüleme ve güncelleme
+- 📚 Mevcut derslere kayıt olma
+- ❌ Kayıtlı derslerden çıkma
+- 📋 Kendi ders kayıtlarını görüntüleme
+
+## 🛡️ Validasyonlar ve İş Kuralları
+
+### 👤 Kullanıcı Validasyonları (Admin & Öğrenci)
+- 📧 Email adresi:
+  - Benzersiz olmalıdır (aynı email ile birden fazla kayıt yapılamaz)
+  - Geçerli email formatında olmalıdır
+  - En fazla 100 karakter olabilir
+
+- 🔐 Şifre:
+  - En az 8 karakter olmalıdır
+  - En az bir büyük harf içermelidir
+  - En az bir küçük harf içermelidir
+  - En az bir rakam içermelidir
+  - En az bir özel karakter içermelidir
+  - En fazla 100 karakter olabilir
+
+- 👤 İsim ve Soyisim:
+  - Boş bırakılamaz
+  - Sadece boşluk karakteri içeremez
+  - En fazla 50 karakter olabilir
+  - String tipinde olmalıdır
+
+### 📚 Ders Validasyonları
+- 📝 Ders Adı:
+  - Boş bırakılamaz
+  - Sadece boşluk karakteri içeremez
+  - String tipinde olmalıdır
+  - Benzersiz olmalıdır (aynı isimde iki ders oluşturulamaz)
+
+- 📄 Ders İçeriği:
+  - Boş bırakılamaz
+  - Sadece boşluk karakteri içeremez
+  - String tipinde olmalıdır
+
+### ⚡ İş Kuralları ve Kısıtlamalar
+- 🚫 Admin kendisini silemez
+- 🔒 Öğrenci sadece kendi profilini güncelleyebilir
+- 📝 Öğrenci sadece kendi derslerini görüntüleyebilir
+- ➕ Öğrenci aynı derse birden fazla kez kayıt olamaz
+- ❌ Öğrenci sadece kayıtlı olduğu dersten çıkabilir
+- 👮‍♂️ Admin tüm öğrenci ve dersleri yönetebilir
+- 🔄 Admin öğrencileri derslere ekleyip çıkarabilir
+- 📊 Admin tüm öğrenci-ders ilişkilerini görüntüleyebilir
+
+## 🛠️ Kullanılan Teknolojiler
+
+### Kullanılan Kütüphaneler
 - 🏗️ **@nestjs/common** (^11.0.1) - NestJS çekirdek kütüphanesi
 - ⚙️ **@nestjs/config** (^4.0.1) - Konfigürasyon yönetimi
 - 🚀 **@nestjs/core** (^11.0.1) - NestJS ana modülü
@@ -22,23 +81,10 @@ Bu proje, öğrenci ve ders yönetimini kapsayan kapsamlı bir web uygulamasıd�
 - 🔑 **passport-jwt** (^4.0.1) - JWT stratejisi
 - 🐘 **pg** (^8.14.1) - PostgreSQL sürücüsü
 - 🔄 **typeorm** (^0.3.21) - ORM kütüphanesi
+- 📡 **swagger-ui-express** (^5.0.1) - Swagger UI
+- 🔄 **reflect-metadata** (^0.2.2) - Metadata reflection
+- 🌊 **rxjs** (^7.8.1) - Reactive Extensions
 
-## 👥 Kullanıcı Rolleri ve Yetkiler
-
-### 👨‍💼 Admin Rolü
-- ➕ Öğrenci ekleme, güncelleme ve silme
-- 📚 Ders ekleme, güncelleme ve silme
-- 🔄 Öğrenci-ders eşleştirmelerini yönetme
-- 📊 Tüm öğrenci ve ders listelerini görüntüleme
-- 📝 Sistem genelinde tam yetki
-
-### 👨‍🎓 Öğrenci Rolü
-- 📝 Kendi profilini görüntüleme ve güncelleme
-- 📚 Mevcut derslere kayıt olma
-- ❌ Kayıtlı derslerden çıkma
-- 📋 Kendi ders kayıtlarını görüntüleme
-
-## 🛠️ Kullanılan Teknolojiler
 
 ### Backend
 - ⚡ NestJS (Node.js framework)
@@ -52,20 +98,26 @@ Bu proje, öğrenci ve ders yönetimini kapsayan kapsamlı bir web uygulamasıd�
 - 👮‍♂️ Role-based access control (RBAC)
 - 🛡️ Guards ve decorators ile yetkilendirme
 - 🔑 Bcrypt ile şifreleme
+- 🚫 Token blacklist sistemi
 
 ### Veritabanı
 - 🐘 PostgreSQL
 - 🔄 TypeORM ile veritabanı yönetimi
 
+### Konteynerizasyon
+- 🐳 Docker
+- 🎭 Docker Compose
+- 📦 Container tabanlı deployment
+
 ### Test
 - 🧪 Jest test framework
-
 
 ## 📁 Proje Mimarisi
 
 ```
 src/
 ├── _base/          # 🏗️ Temel sınıflar ve yapılar
+├── _common/        # 🔧 Ortak kullanılan araçlar ve filtreler
 ├── _config/        # ⚙️ Konfigürasyon dosyaları
 ├── _security/      # 🔒 Güvenlik ile ilgili dosyalar
 ├── admins/         # 👨‍💼 Admin modülü
@@ -78,8 +130,9 @@ src/
 
 ### 📋 Ön Gereksinimler
 - Node.js (v18 veya üzeri)
-- PostgreSQL
+- Docker ve Docker Compose
 - npm veya yarn
+- PostgreSQL (Docker kullanmıyorsanız)
 
 ### 🔧 Kurulum Adımları
 
@@ -105,25 +158,39 @@ DB_NAME=***
 JWT_SECRET=***
 ```
 
-4. Veritabanını oluşturun:
+4. Uygulamayı başlatmanın iki yolu var:
+
+#### A) Docker ile Çalıştırma (Önerilen):
 ```bash
-# PostgreSQL'de veritabanını oluşturun
-createdb DB_NAME
+# Docker container'larını başlat
+docker-compose up -d
+
 ```
 
-5. Uygulamayı başlatın:
+#### B) Yerel Geliştirme Ortamında Çalıştırma:
 ```bash
-# Geliştirme modu
-npm run start:dev
+# PostgreSQL'de veritabanını oluştur
+createdb your_database_name
 
-# Prodüksiyon modu
-npm run start:prod
+# Uygulamayı başlat
+npm run start:dev
+```
+
+### 🐳 Docker Komutları
+
+```bash
+# Container'ları başlat
+docker-compose up -d
+
+# Container'ları durdur
+docker-compose down
+
 ```
 
 ### 🌐 API Endpoints
 
-API dokümantasyonuna aşağıdaki URL'lerden erişebilirsiniz:
-- Swagger UI: `http://localhost:3000/api`
+API dokümantasyonuna aşağıdaki URL'den erişebilirsiniz:
+- Swagger UI: `http://localhost:3001/api`
 
 ## 🔍 Test
 
@@ -132,3 +199,7 @@ API dokümantasyonuna aşağıdaki URL'lerden erişebilirsiniz:
 npm run test
 
 ```
+
+
+
+
