@@ -31,11 +31,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(req: Request, payload: JwtPayload) {
-    console.log('JWT Strategy - Incoming payload:', payload);
-
     const token = req.headers.authorization?.split(' ')[1];
-    console.log('Current token:', token);
-
+    
     if (token && tokenBlacklist.has(token)) {
       throw new UnauthorizedException(new BaseResponse(null, 'Token geçersiz', 401));
     }
@@ -57,14 +54,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         throw new UnauthorizedException(new BaseResponse(null, 'Geçersiz kullanıcı tipi', 401));
       }
 
-      return {
-        sub: payload.sub,
+      const user = {
+        id: payload.sub,
         email: payload.email,
         type: payload.type
       };
+      return user;
       
     } catch (error) {
-      console.error('Validation error:', error);
       throw new UnauthorizedException(new BaseResponse(null, 'Kullanıcı bulunamadı veya yetkisiz', 401));
     }
   }

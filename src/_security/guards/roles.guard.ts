@@ -13,12 +13,21 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    console.log('Required Types:', requiredTypes);
-    const { user } = context.switchToHttp().getRequest();
-    console.log('User in Guard:', user);
-
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    
     if (!requiredTypes) {
       return true;
+    }
+
+    if (!user || !user.type) {
+      throw new UnauthorizedException(
+        new BaseResponse(
+          null,
+          'Kullanıcı bilgisi bulunamadı',
+          401
+        )
+      );
     }
 
     const hasPermission = requiredTypes.some((type) => user.type === type);

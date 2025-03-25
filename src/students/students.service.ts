@@ -79,8 +79,6 @@ export class StudentsService {
     });
   }
 
-  
-
   // KURS İŞLEMLERİ İÇİN SERVİSLER
   
   // Öğrenciyi ve kurslarını getiren method
