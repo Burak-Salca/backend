@@ -21,30 +21,23 @@ import { Courses } from './courses/courses.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const host = configService.get('DB_HOST');
-        const port = configService.get('DB_PORT');
-        const username = configService.get('DB_USERNAME');
-        const password = configService.get('DB_PASSWORD');
-        const database = configService.get('DB_NAME');
-
-        if (!host || !port || !username || !password || !database) {
-          throw new Error('Database configuration is missing');
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+    
+        if (!databaseUrl) {
+          throw new Error('DATABASE_URL is not defined');
         }
-
+    
         return {
           type: 'postgres',
-          host,
-          port: parseInt(port, 10),
-          username,
-          password,
-          database,
+          url: databaseUrl,
           entities: [Students, Admins, Courses],
-          synchronize: true,
+          synchronize: true, // production'da dikkatli ol
           logging: true,
         };
       },
       inject: [ConfigService],
     }),
+    
     TypeOrmModule.forFeature([Students, Admins, Courses]),
     StudentsModule,
     CoursesModule,
